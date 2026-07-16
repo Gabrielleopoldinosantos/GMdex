@@ -1,0 +1,269 @@
+/* -----------------------------------------------------------
+   CLIPADAS — estilos específicos desta aba
+   (usa as variáveis de cor/fonte já definidas em stilo.css)
+----------------------------------------------------------- */
+
+.clip-hero{ padding-bottom: 50px; }
+
+/* ---------- linha do filtro ---------- */
+.filter-row{
+  display:flex;
+  align-items:center;
+  gap: 16px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+/* ---------- dropdown "seletor de fita" ---------- */
+.filter-wrap{ position: relative; }
+
+.filter-btn{
+  display:flex; align-items:center; gap:10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 13.5px;
+  letter-spacing: .3px;
+  padding: 12px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: border-color .2s ease, transform .15s ease;
+}
+.filter-btn:hover{ border-color: var(--accent-orange); transform: translateY(-1px); }
+.filter-btn[aria-expanded="true"]{ border-color: var(--accent-mint); }
+
+.filter-reel{
+  width: 14px; height:14px;
+  border-radius: 50%;
+  background: repeating-conic-gradient(var(--accent-orange) 0deg 45deg, transparent 45deg 90deg);
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.filter-caret{
+  color: var(--text-dim);
+  font-size: 11px;
+  transition: transform .2s ease;
+}
+.filter-btn[aria-expanded="true"] .filter-caret{ transform: rotate(180deg); }
+
+.filter-list{
+  position:absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 210px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.45);
+  list-style:none;
+  overflow: hidden;
+  z-index: 60;
+}
+.filter-list li{
+  padding: 11px 16px;
+  font-size: 13px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--text-dim);
+  cursor: pointer;
+  border-bottom: 1px dashed var(--line);
+  transition: background .15s ease, color .15s ease;
+}
+.filter-list li:last-child{ border-bottom: none; }
+.filter-list li:hover{ background: var(--bg-soft); color: var(--text); }
+.filter-list li.active{ color: var(--accent-mint); font-weight: 600; }
+.filter-list li.active::before{ content:"● "; font-size: 9px; }
+
+/* ---------- botão "+" discreto ---------- */
+.add-clip-btn{
+  width: 38px; height:38px;
+  border-radius: 50%;
+  border: 1px dashed var(--line);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, transform .15s ease;
+}
+.add-clip-btn:hover{
+  color: var(--accent-mustard);
+  border-color: var(--accent-mustard);
+  transform: rotate(90deg);
+}
+
+/* ---------- cards de citação — moldura de "ficha" ---------- */
+.clip-card{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 32px 24px 20px;
+  position: relative;
+  box-shadow: 5px 5px 0 var(--bg-soft);
+}
+.clip-card:nth-child(3n+1){ transform: rotate(-0.6deg); }
+.clip-card:nth-child(3n+2){ transform: rotate(0.5deg); }
+.clip-card:nth-child(3n+3){ transform: rotate(-0.3deg); }
+.clip-card:hover{
+  transform: rotate(0deg) translateY(-4px);
+  border-color: var(--accent-mint);
+  box-shadow: 5px 5px 0 var(--accent-mint);
+}
+
+/* moldura interna tracejada, tipo passe-partout de ficha catalográfica */
+.clip-card::before{
+  content:"";
+  position:absolute;
+  inset: 11px;
+  border: 1px dashed var(--line);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* fita no topo, igual aos cards do arquivo principal */
+.clip-card .tape{
+  position:absolute; top:-10px; left: 50%;
+  width: 56px; height:18px;
+  background: linear-gradient(180deg, #d8cfae, #c9bd91);
+  opacity: .85;
+  transform: translateX(-50%) rotate(-2deg);
+  box-shadow: 0 2px 4px rgba(0,0,0,.35);
+}
+
+/* "número de ficha" no canto, decorativo */
+.clip-card::after{
+  content: "Nº " attr(data-index);
+  position:absolute;
+  top: 8px; right: 14px;
+  font-size: 9.5px;
+  letter-spacing: .5px;
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.clip-text{
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
+  line-height: 1.35;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.clip-text::before{ content:"“"; color: var(--accent-orange); }
+.clip-text::after{ content:"”"; color: var(--accent-orange); }
+
+.clip-meta{
+  display:flex; align-items:baseline; justify-content: space-between;
+  border-top: 1px dashed var(--line);
+  padding-top: 10px;
+  font-size: 12.5px;
+}
+.clip-author{ color: var(--accent-mustard); font-weight: 600; letter-spacing: .3px; }
+.clip-year{ color: var(--text-dim); }
+
+/* ---------- modal de nova clipada ---------- */
+.modal{
+  position: fixed; inset:0;
+  background: rgba(10,9,11,.72);
+  display:flex; align-items:center; justify-content:center;
+  z-index: 200;
+  padding: 20px;
+}
+.modal-box{
+  position: relative;
+  width: 100%; max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 28px 26px 22px;
+}
+.modal-tape{
+  position:absolute; top:-10px; left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 70px; height:20px;
+  background: linear-gradient(180deg, #d8cfae, #c9bd91);
+  opacity: .85;
+  box-shadow: 0 2px 4px rgba(0,0,0,.35);
+}
+.modal-box h3{
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: .5px;
+  margin-bottom: 18px;
+}
+.modal-box form{ display:grid; gap: 18px; }
+.modal-box label{
+  font-size: 11px; color: var(--text-dim);
+  letter-spacing:1px; text-transform: uppercase;
+  display:block; margin-bottom: 7px;
+}
+
+/* inputs no estilo "ficha datilografada": sem caixa fechada,
+   só um traço embaixo, como se fosse escrito numa linha de índice */
+.modal-box input,
+.modal-box textarea,
+.modal-box select{
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--line);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  padding: 8px 2px 10px;
+  border-radius: 0;
+  transition: border-color .15s ease;
+}
+.modal-box input::placeholder,
+.modal-box textarea::placeholder{ color: var(--text-dim); opacity: .6; }
+.modal-box input:focus,
+.modal-box textarea:focus,
+.modal-box select:focus{
+  outline: none;
+  border-bottom: 1px solid var(--accent-mint);
+}
+.modal-box select{
+  border-bottom: 1px dashed var(--line);
+  cursor: pointer;
+}
+.modal-box select option{ background: var(--bg-soft); }
+.modal-box textarea{ resize: vertical; min-height: 84px; font-family: 'Caveat', cursive; font-size: 19px; }
+
+.modal-actions{ display:flex; gap: 14px; align-items:center; margin-top: 4px; }
+
+/* botão principal: "carimbo" de publicação */
+.clip-btn-primary{
+  background: var(--accent-mint);
+  color: #1a1512;
+  border: 2px solid #1a1512;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 11px 20px;
+  border-radius: 2px;
+  cursor: pointer;
+  transform: rotate(-1deg);
+  transition: transform .15s ease, background .15s ease;
+}
+.clip-btn-primary:hover{ transform: rotate(0deg) translateY(-2px); background: var(--accent-mustard); }
+
+/* botão secundário: texto discreto, sem caixa */
+.clip-btn-ghost{
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  letter-spacing: .3px;
+  text-decoration: underline dashed;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  padding: 6px 4px;
+  transition: color .15s ease;
+}
+.clip-btn-ghost:hover{ color: var(--accent-orange); }
+
+#clip-form-status{ font-size: 12px; color: var(--text-dim); }

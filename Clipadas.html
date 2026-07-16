@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GM — CLIPADAS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stilo.css">
+<link rel="stylesheet" href="clipadas.css">
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo"><span class="dot"></span>GM — CLIPADAS</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">início</a></li>
+        <li><a href="index.html#board">arquivo</a></li>
+        <li><a href="#clipadas">clipadas</a></li>
+        <li><a href="index.html#turma">a turma</a></li>
+        <li><a href="index.html#footer">contato</a></li>
+      </ul>
+    </nav>
+    <div class="auth-box" id="auth-box">
+      <button id="login-btn" class="login-btn">Entrar com Google</button>
+      <div id="user-box" class="user-box" style="display:none;">
+        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <span id="user-name"></span>
+        <button id="logout-btn" class="logout-btn">Sair</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Tela de acesso restrito: mostrada pra quem não logou -->
+<div class="locked-screen" id="locked-screen">
+  <div class="locked-box">
+    <div class="eyebrow">acesso restrito</div>
+    <h2>Introza não carai</h2>
+    <p>Fazer login com Google para continuar.</p>
+    <button id="login-btn-2" class="rewind-btn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 6V2L5 8l6 6v-4c4.4 0 8 3.6 8 8h2c0-5.5-4.5-10-10-10z"/></svg>
+      Entrar com Google
+    </button>
+    <p id="access-denied-msg" class="denied-msg" style="display:none;"></p>
+  </div>
+</div>
+
+<!-- Conteúdo do site: só aparece depois do login -->
+<div id="app-content" class="hidden">
+
+  <section class="hero clip-hero">
+    <div class="eyebrow">o que já foi dito não se apaga</div>
+    <h1>CLIPADAS</h1>
+    <p class="sub">O bestiario oficial de tudo que <str ong>alguém falou e vai se arrepender</strong>.</p>
+  </section>
+
+  <section class="board" id="clipadas">
+
+    <div class="filter-row">
+      <div class="filter-wrap">
+        <button id="filter-btn" class="filter-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="filter-reel"></span>
+          <span id="filter-label">Recentes</span>
+          <span class="filter-caret">▾</span>
+        </button>
+        <ul id="filter-list" class="filter-list hidden" role="listbox"></ul>
+      </div>
+
+      <button id="add-clip-btn" class="add-clip-btn hidden" title="Adicionar clipada" aria-label="Adicionar clipada">+</button>
+    </div>
+
+    <div class="grid clip-grid" id="clip-grid"></div>
+    <p id="clip-empty" style="display:none; color:var(--text-dim); font-size:13px;">
+      Nenhuma clipada aqui ainda. Bora consertar isso 👇
+    </p>
+
+  </section>
+
+</div>
+
+<!-- Modal de nova clipada -->
+<div id="clip-modal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-tape"></div>
+    <h3>Nova clipada</h3>
+    <form id="clip-form">
+      <div id="author-select-wrap">
+        <label for="clip-author">De quem é</label>
+        <select id="clip-author" name="author"></select>
+      </div>
+      <div>
+        <label for="clip-text">O que foi dito</label>
+        <textarea id="clip-text" name="text" required placeholder="digita a frase exata aqui..."></textarea>
+      </div>
+      <div>
+        <label for="clip-year">Ano</label>
+        <input type="text" id="clip-year" name="year" required placeholder="2024" inputmode="numeric" maxlength="4">
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="clip-btn-primary">Publicar clipada</button>
+        <button type="button" id="clip-modal-close" class="clip-btn-ghost">Cancelar</button>
+      </div>
+      <span id="clip-form-status"></span>
+    </form>
+  </div>
+</div>
+
+<footer id="footer">
+  <div class="footer-inner">
+    <div>
+        <div class="logo">SANATÓRIO - GM</div>
+        <p class="fine">feito por um homem que se perdeu. 2026.</p>
+    </div>
+    <div class="socials">
+      <a href="#">instagram</a>
+      <a href="https://www.youtube.com/@SurtoColetivo_GM">Youtube</a>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="clipadas.js"></script>
+
+</body>
+</html>

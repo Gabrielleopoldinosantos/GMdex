@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SANATÓRIO da GM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stilo.css">
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo"><span class="dot"></span>SANATÓRIO | GM</div>
+    <nav>
+      <ul>
+        <li><a href="Clipadas.html">CLIPADAS</a></li>
+        <li><a href="#board">arquivo</a></li>
+        <li><a href="#novo">postar</a></li>
+        <li><a href="#turma">a turma</a></li>
+        <li><a href="#footer">contato</a></li>
+      </ul>
+    </nav>
+    <div class="auth-box" id="auth-box">
+      <button id="login-btn" class="login-btn">Entrar com Google</button>
+      <div id="user-box" class="user-box" style="display:none;">
+        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <span id="user-name"></span>
+        <button id="logout-btn" class="logout-btn">Sair</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Tela de acesso restrito: mostrada pra quem não logou -->
+<div class="locked-screen" id="locked-screen">
+  <div class="locked-box">
+    <div class="eyebrow">acesso restrito</div>
+    <h2>Introza não carai</h2>
+    <p>Fazer login com Google para continuar.</p>
+    <button id="login-btn-2" class="rewind-btn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 6V2L5 8l6 6v-4c4.4 0 8 3.6 8 8h2c0-5.5-4.5-10-10-10z"/></svg>
+      Entrar com Google
+    </button>
+    <p id="access-denied-msg" class="denied-msg" style="display:none;"></p>
+  </div>
+</div>
+
+<!-- Conteúdo do site: só aparece depois do login -->
+<div id="app-content" class="hidden">
+
+  <section class="hero">
+    <div class="eyebrow">anotando desde 2022</div>
+    <h1><span class="type" id="typed"></span></h1>
+    <p class="sub">O lugar onde a gente guarda <strong>tudo o que não podendo no grupo do Zap</strong> (ou não é muito ético, funny).</p>
+    <a class="rewind-btn" href="#board">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11 6V2L5 8l6 6v-4c4.4 0 8 3.6 8 8h2c0-5.5-4.5-10-10-10z"/></svg>
+      Puxa a vinheta
+    </a>
+  </section>
+
+  <section class="board" id="board">
+    <div class="section-label"><span>último lançamento</span><div class="rule"></div></div>
+
+    <!-- Os posts abaixo são carregados dinamicamente do Firestore pelo script.js -->
+    <div class="grid" id="posts-grid"></div>
+    <p id="posts-empty" style="display:none; color:var(--text-dim); font-size:13px;">
+      Nenhum post ainda. Seja o primeiro a postar ali embaixo 👇
+    </p>
+  </section>
+
+  <section class="new-post" id="novo">
+    <div class="section-label"><span>criar post</span><div class="rule"></div></div>
+    <form id="new-post-form">
+      <div>
+        <label for="title">Título</label>
+        <input type="text" id="title" name="title" required>
+      </div>
+      <div>
+        <label for="text">Texto</label>
+        <textarea id="text" name="text" required></textarea>
+      </div>
+      <div>
+        <label for="tag">Categoria</label>
+        <select id="tag" name="tag">
+          <option value="jogos">jogos</option>
+          <option value="receita">receita</option>
+          <option value="filme">filme</option>
+          <option value="role">rolê</option>
+        </select>
+      </div>
+      <div>
+        <label for="image">Imagem (opcional)</label>
+        <input type="file" id="image" name="image" accept="image/*">
+      </div>
+      <button type="submit">Publicar</button>
+      <span id="form-status"></span>
+    </form>
+    <p id="no-permission-msg" class="denied-msg" style="display:none;">
+      Você tá logado, mas ainda não tem permissão pra postar. Pede pro admin te liberar.
+    </p>
+  </section>
+
+  <section class="turma" id="turma">
+    <div class="section-label"><span>quem assinou com o coisa ruim</span><div class="rule"></div></div>
+    <div class="turma-grid">
+      <div class="friend">
+        <div class="avatar-big" style="background:var(--accent-mint)">L
+          <img src="rsc/img/Sherma Fan Art.jpg" alt="Leopoldino" onerror="this.style.display='none'">
+        </div>
+        <h4>Leopoldino</h4>
+        <p>Asmodeus da edição</p>
+        <p class="note">"Eu meço 9 picas dura do Ernesto de La Cruz empilhadas"</p>
+      </div>
+      <div class="friend">
+        <div class="avatar-big" style="background:var(--accent-pink)">?
+          <img src="fotos/pessoa2.jpg" alt="NOME" onerror="this.style.display='none'">
+        </div>
+        <h4>NOME</h4>
+        <p>Especialidade</p>
+        <p class="note">"clipada foda"</p>
+      </div>
+      <div class="friend">
+        <div class="avatar-big" style="background:var(--accent-mustard)">?
+          <img src="fotos/pessoa3.jpg" alt="NOME" onerror="this.style.display='none'">
+        </div>
+        <h4>NOME</h4>
+        <p>Especialidade</p>
+        <p class="note">"clipada foda"</p>
+      </div>
+      <div class="friend">
+        <div class="avatar-big" style="background:var(--accent-orange)">?
+          <img src="fotos/pessoa4.jpg" alt="NOME" onerror="this.style.display='none'">
+        </div>
+        <h4>NOME</h4>
+        <p>Especialidade</p>
+        <p class="note">"clipada foda"</p>
+      </div>
+      <div class="friend">
+        <div class="avatar-big" style="background:#9d8cff">?
+          <img src="fotos/pessoa5.jpg" alt="NOME" onerror="this.style.display='none'">
+        </div>
+        <h4>NOME</h4>
+        <p>Especialidade</p>
+        <p class="note">"clipada foda"</p>
+      </div>
+    </div>
+  </section>
+
+  <footer id="footer">
+    <div class="footer-inner">
+      <div>
+        <div class="logo">SANATÓRIO da GM</div>
+        <p class="fine">feito por um homem que se perdeu. 2026.</p>
+      </div>
+      <div class="socials">
+        <a href="#">instagram</a>
+        <a href="https://www.youtube.com/@SurtoColetivo_GM">Youtube</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script type="module" src="script.js"></script>
+
+</body>
+</html>
