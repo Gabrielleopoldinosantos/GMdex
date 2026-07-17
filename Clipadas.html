@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GM — CLIPADAS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="stilo.css">
 <link rel="stylesheet" href="Clipadas.css">
 </head>
@@ -16,7 +17,8 @@
     <div class="logo"><span class="dot"></span>GM — CLIPADAS</div>
     <nav>
       <ul>
-        <li><a href="index.html">início</a></li>
+        <li><a href="index.html">INÍCIO</a></li>
+        <li><a href="Canetada.html">CANETADA</a></li>
         <li><a href="index.html#board">arquivo</a></li>
         <li><a href="#clipadas">clipadas</a></li>
         <li><a href="index.html#turma">a turma</a></li>
@@ -69,6 +71,10 @@
         <ul id="filter-list" class="filter-list hidden" role="listbox"></ul>
       </div>
 
+      <button id="random-clip-btn" class="random-btn" title="Clipada aleatória" aria-label="Sortear clipada aleatória">
+        <span class="dice">🎲</span> Clipada random
+      </button>
+
       <button id="add-clip-btn" class="add-clip-btn hidden" title="Adicionar clipada" aria-label="Adicionar clipada">+</button>
     </div>
 
@@ -105,6 +111,19 @@
       </div>
       <span id="clip-form-status"></span>
     </form>
+  </div>
+</div>
+
+<!-- Modal da clipada aleatória -->
+<div id="random-modal" class="modal hidden">
+  <div class="modal-box random-modal-box">
+    <div class="modal-tape"></div>
+    <div class="random-label">🎲 no bico da sorte</div>
+    <div id="random-card-wrap" class="random-card-wrap"></div>
+    <div class="modal-actions">
+      <button type="button" id="random-again-btn" class="clip-btn-primary">Sortear outra</button>
+      <button type="button" id="random-modal-close" class="clip-btn-ghost">Fechar</button>
+    </div>
   </div>
 </div>
 

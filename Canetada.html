@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GM — CANETADA MILAGROSA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="stilo.css">
+<link rel="stylesheet" href="Canetada.css">
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo"><span class="dot"></span>GM — CANETADA</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">INÍCIO</a></li>
+        <li><a href="Clipadas.html">CLIPADAS</a></li>
+        <li><a href="index.html#board">arquivo</a></li>
+        <li><a href="Clipadas.html">clipadas</a></li>
+        <li><a href="#canetada">canetada</a></li>
+        <li><a href="index.html#footer">contato</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- Esta página é aberta: sem tela de login, qualquer um pode ver e sugerir -->
+<div id="app-content">
+
+  <section class="hero can-hero">
+    <div class="eyebrow">livre pra todo mundo</div>
+    <h1>CANETADA MILAGROSA</h1>
+    <p class="sub">Teve alguma <strong>ideia foda pra adicionar pro bagui aqui</strong>? Solta aqui embaixo. Sem login, sem burocracia, só caneta e me ajuda please.</p>
+  </section>
+
+  <section class="board" id="canetada">
+
+    <div class="filter-row">
+      <div class="filter-wrap">
+        <button id="filter-btn" class="filter-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="filter-reel"></span>
+          <span id="filter-label">Todas</span>
+          <span class="filter-caret">▾</span>
+        </button>
+        <ul id="filter-list" class="filter-list hidden" role="listbox"></ul>
+      </div>
+
+      <button id="add-idea-btn" class="add-clip-btn" title="Sugerir ideia" aria-label="Sugerir ideia">+</button>
+    </div>
+
+    <div class="grid idea-grid" id="idea-grid"></div>
+    <p id="idea-empty" style="display:none; color:var(--text-dim); font-size:13px;">
+      Nenhuma ideia ainda. Sê o primeiro a canetar 👇
+    </p>
+
+  </section>
+
+</div>
+
+<!-- Modal de nova ideia -->
+<div id="idea-modal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-tape"></div>
+    <h3>Nova ideia</h3>
+    <form id="idea-form">
+      <div>
+        <label for="idea-title">Título da ideia</label>
+        <input type="text" id="idea-title" name="title" required maxlength="80" placeholder="tipo um título de post...">
+      </div>
+      <div>
+        <label for="idea-text">Do que se trata</label>
+        <textarea id="idea-text" name="text" required maxlength="600" placeholder="desenrola a ideia aqui..."></textarea>
+      </div>
+      <div>
+        <label for="idea-tag">Categoria</label>
+        <select id="idea-tag" name="tag">
+          <option value="jogos">jogos</option>
+          <option value="receita">receita</option>
+          <option value="filme">filme</option>
+          <option value="role">rolê</option>
+          <option value="outro">outro</option>
+        </select>
+      </div>
+      <div>
+        <label for="idea-author">De quem é (opcional)</label>
+        <input type="text" id="idea-author" name="author" maxlength="30" placeholder="deixa em branco pra ser anônimo">
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="clip-btn-primary">Canetar</button>
+        <button type="button" id="idea-modal-close" class="clip-btn-ghost">Cancelar</button>
+      </div>
+      <span id="idea-form-status"></span>
+    </form>
+  </div>
+</div>
+
+<footer id="footer">
+  <div class="footer-inner">
+    <div>
+        <div class="logo">SANATÓRIO - GM</div>
+        <p class="fine">feito por um homem que se perdeu. 2026.</p>
+    </div>
+    <div class="socials">
+      <a href="#">instagram</a>
+      <a href="https://www.youtube.com/@SurtoColetivo_GM">Youtube</a>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="Canetada.js"></script>
+
+</body>
+</html>

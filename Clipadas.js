@@ -52,6 +52,7 @@ const AUTHORS = [
 let currentFilter = "recentes"; // chave do filtro ativo
 let canPost = false;
 let allClips = []; // cache local de tudo que veio do Firestore
+let lastRandomIndex = -1; // pra tentar não repetir a mesma clipada duas vezes seguidas
 
 // ---------------------------------------------------------
 // ELEMENTOS DE AUTENTICAÇÃO / GATE DE ACESSO
@@ -292,4 +293,50 @@ clipForm.addEventListener("submit", async (e) => {
     console.error("Erro ao publicar clipada:", err);
     clipFormStatus.textContent = "Deu ruim ao publicar. Olha o console pra detalhes.";
   }
+});
+
+// ---------------------------------------------------------
+// MODAL — clipada aleatória
+// ---------------------------------------------------------
+const randomBtn = document.getElementById("random-clip-btn");
+const randomModal = document.getElementById("random-modal");
+const randomCardWrap = document.getElementById("random-card-wrap");
+const randomModalClose = document.getElementById("random-modal-close");
+const randomAgainBtn = document.getElementById("random-again-btn");
+
+function pickRandomClip() {
+  if (allClips.length === 0) return null;
+  if (allClips.length === 1) return allClips[0];
+
+  // sorteia um índice diferente do último mostrado, pra não repetir seguido
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * allClips.length);
+  } while (idx === lastRandomIndex);
+  lastRandomIndex = idx;
+  return allClips[idx];
+}
+
+function showRandomClip() {
+  const pick = pickRandomClip();
+  randomCardWrap.innerHTML = "";
+
+  if (!pick) {
+    randomCardWrap.innerHTML = `<p style="color:var(--text-dim); font-size:13.5px;">Ainda não tem nenhuma clipada registrada pra sortear.</p>`;
+  } else {
+    randomCardWrap.appendChild(renderCard(pick, 0));
+  }
+
+  randomModal.classList.remove("hidden");
+}
+
+function closeRandomModal() {
+  randomModal.classList.add("hidden");
+}
+
+randomBtn.addEventListener("click", showRandomClip);
+randomAgainBtn.addEventListener("click", showRandomClip);
+randomModalClose.addEventListener("click", closeRandomModal);
+randomModal.addEventListener("click", (e) => {
+  if (e.target === randomModal) closeRandomModal();
 });

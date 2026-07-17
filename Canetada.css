@@ -1,11 +1,11 @@
 /* -----------------------------------------------------------
-   CLIPADAS — estilos específicos desta aba
+   CANETADA MILAGROSA — estilos específicos desta aba
    (usa as variáveis de cor/fonte já definidas em stilo.css)
 ----------------------------------------------------------- */
 
-.clip-hero{ padding-bottom: 50px; }
+.can-hero{ padding-bottom: 50px; }
 
-/* ---------- linha do filtro ---------- */
+/* ---------- linha do filtro (reaproveita o dropdown das Clipadas) ---------- */
 .filter-row{
   display:flex;
   align-items:center;
@@ -14,7 +14,6 @@
   flex-wrap: wrap;
 }
 
-/* ---------- dropdown "seletor de fita" ---------- */
 .filter-wrap{ position: relative; }
 
 .filter-btn{
@@ -37,7 +36,7 @@
 .filter-reel{
   width: 14px; height:14px;
   border-radius: 50%;
-  background: repeating-conic-gradient(var(--accent-orange) 0deg 45deg, transparent 45deg 90deg);
+  background: repeating-conic-gradient(var(--accent-mustard) 0deg 45deg, transparent 45deg 90deg);
   border: 1px solid var(--line);
   flex-shrink: 0;
 }
@@ -53,7 +52,7 @@
   position:absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 210px;
+  min-width: 190px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -73,43 +72,8 @@
 }
 .filter-list li:last-child{ border-bottom: none; }
 .filter-list li:hover{ background: var(--bg-soft); color: var(--text); }
-.filter-list li.active{ color: var(--accent-mint); font-weight: 600; }
+.filter-list li.active{ color: var(--accent-mustard); font-weight: 600; }
 .filter-list li.active::before{ content:"● "; font-size: 9px; }
-
-/* ---------- botão "sortear clipada aleatória" ---------- */
-.random-btn{
-  display:flex; align-items:center; gap:8px;
-  background: transparent;
-  border: 1px dashed var(--accent-mustard);
-  color: var(--accent-mustard);
-  font-family: 'IBM Plex Mono', monospace;
-  font-weight: 600;
-  font-size: 12.5px;
-  letter-spacing: .3px;
-  padding: 11px 16px;
-  border-radius: 30px;
-  cursor: pointer;
-  transition: border-color .2s ease, transform .15s ease, background .15s ease;
-  margin-left: auto;
-}
-.random-btn .dice{
-  display:inline-block;
-  font-size: 15px;
-  transition: transform .35s ease;
-}
-.random-btn:hover{
-  background: #f2c14e14;
-  border-style: solid;
-  transform: translateY(-1px);
-}
-.random-btn:hover .dice{ transform: rotate(25deg) scale(1.15); }
-.random-btn:active .dice{ animation: dice-roll .5s ease; }
-@keyframes dice-roll{
-  0%{ transform: rotate(0deg); }
-  30%{ transform: rotate(120deg) scale(1.2); }
-  60%{ transform: rotate(240deg) scale(0.95); }
-  100%{ transform: rotate(360deg) scale(1); }
-}
 
 /* ---------- botão "+" discreto ---------- */
 .add-clip-btn{
@@ -122,85 +86,81 @@
   line-height: 1;
   cursor: pointer;
   transition: color .15s ease, border-color .15s ease, transform .15s ease;
+  margin-left: auto;
 }
 .add-clip-btn:hover{
   color: var(--accent-mustard);
   border-color: var(--accent-mustard);
   transform: rotate(90deg);
 }
-/* quando o botão de sortear já empurrou tudo pra direita com margin-left:auto,
-   o "+" fica colado nele — só um respiro visual */
-.random-btn + .add-clip-btn{ margin-left: 4px; }
 
-/* ---------- cards de citação — moldura de "ficha" ---------- */
-.clip-card{
+/* ---------- cards de ideia ---------- */
+.idea-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+@media (max-width: 860px){ .idea-grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 600px){ .idea-grid{ grid-template-columns: 1fr; } }
+
+.idea-card{
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 3px;
-  padding: 32px 24px 20px;
+  border-radius: 4px;
+  padding: 22px;
   position: relative;
-  box-shadow: 5px 5px 0 var(--bg-soft);
+  transition: transform .2s ease, border-color .2s ease;
+  display:flex; flex-direction:column; gap:12px;
 }
-.clip-card:nth-child(3n+1){ transform: rotate(-0.6deg); }
-.clip-card:nth-child(3n+2){ transform: rotate(0.5deg); }
-.clip-card:nth-child(3n+3){ transform: rotate(-0.3deg); }
-.clip-card:hover{
-  transform: rotate(0deg) translateY(-4px);
-  border-color: var(--accent-mint);
-  box-shadow: 5px 5px 0 var(--accent-mint);
-}
+.idea-card:nth-child(3n+1){ transform: rotate(-0.6deg); }
+.idea-card:nth-child(3n+2){ transform: rotate(0.5deg); }
+.idea-card:nth-child(3n+3){ transform: rotate(-0.3deg); }
+.idea-card:hover{ transform: rotate(0deg) translateY(-4px); border-color: var(--accent-mustard); }
 
-/* moldura interna tracejada, tipo passe-partout de ficha catalográfica */
-.clip-card::before{
-  content:"";
-  position:absolute;
-  inset: 11px;
-  border: 1px dashed var(--line);
-  border-radius: 2px;
-  pointer-events: none;
-}
-
-/* fita no topo, igual aos cards do arquivo principal */
-.clip-card .tape{
-  position:absolute; top:-10px; left: 50%;
-  width: 56px; height:18px;
+.idea-card .tape{
+  position:absolute; top:-10px; left: 24px;
+  width: 60px; height:20px;
   background: linear-gradient(180deg, #d8cfae, #c9bd91);
   opacity: .85;
-  transform: translateX(-50%) rotate(-2deg);
+  transform: rotate(-3deg);
   box-shadow: 0 2px 4px rgba(0,0,0,.35);
 }
 
-/* "número de ficha" no canto, decorativo */
-.clip-card::after{
-  content: "Nº " attr(data-index);
-  position:absolute;
-  top: 8px; right: 14px;
-  font-size: 9.5px;
+.idea-card h3{
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
   letter-spacing: .5px;
+  line-height: 1.05;
+}
+.idea-card p.idea-body{
+  font-size: 13.5px;
+  color: var(--text-dim);
+  flex-grow:1;
+}
+
+.idea-meta{
+  display:flex; align-items:center; justify-content: space-between;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  border-top: 1px dashed var(--line);
+  padding-top: 12px;
+}
+.idea-author{ font-weight: 600; color: var(--accent-mustard); }
+
+.vote-btn{
+  display:flex; align-items:center; gap:6px;
+  background: transparent;
+  border: 1px solid var(--line);
   color: var(--text-dim);
   font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, transform .15s ease;
 }
+.vote-btn:hover{ border-color: var(--accent-mint); color: var(--accent-mint); transform: translateY(-1px); }
+.vote-btn.voted{ border-color: var(--accent-mint); color: var(--accent-mint); }
+.vote-btn .pen{ font-size: 13px; }
 
-.clip-text{
-  font-family: 'Caveat', cursive;
-  font-size: 22px;
-  line-height: 1.35;
-  color: var(--text);
-  margin-bottom: 20px;
-}
-.clip-text::before{ content:"“"; color: var(--accent-orange); }
-.clip-text::after{ content:"”"; color: var(--accent-orange); }
-
-.clip-meta{
-  display:flex; align-items:baseline; justify-content: space-between;
-  border-top: 1px dashed var(--line);
-  padding-top: 10px;
-  font-size: 12.5px;
-}
-.clip-author{ color: var(--accent-mustard); font-weight: 600; letter-spacing: .3px; }
-.clip-year{ color: var(--text-dim); }
-
-/* ---------- modal de nova clipada ---------- */
+/* ---------- modal (reaproveita a base das Clipadas) ---------- */
 .modal{
   position: fixed; inset:0;
   background: rgba(10,9,11,.72);
@@ -236,9 +196,6 @@
   letter-spacing:1px; text-transform: uppercase;
   display:block; margin-bottom: 7px;
 }
-
-/* inputs no estilo "ficha datilografada": sem caixa fechada,
-   só um traço embaixo, como se fosse escrito numa linha de índice */
 .modal-box input,
 .modal-box textarea,
 .modal-box select{
@@ -259,20 +216,16 @@
 .modal-box textarea:focus,
 .modal-box select:focus{
   outline: none;
-  border-bottom: 1px solid var(--accent-mint);
+  border-bottom: 1px solid var(--accent-mustard);
 }
-.modal-box select{
-  border-bottom: 1px dashed var(--line);
-  cursor: pointer;
-}
+.modal-box select{ border-bottom: 1px dashed var(--line); cursor: pointer; }
 .modal-box select option{ background: var(--bg-soft); }
-.modal-box textarea{ resize: vertical; min-height: 84px; font-family: 'Caveat', cursive; font-size: 19px; }
+.modal-box textarea{ resize: vertical; min-height: 84px; }
 
 .modal-actions{ display:flex; gap: 14px; align-items:center; margin-top: 4px; }
 
-/* botão principal: "carimbo" de publicação */
 .clip-btn-primary{
-  background: var(--accent-mint);
+  background: var(--accent-mustard);
   color: #1a1512;
   border: 2px solid #1a1512;
   font-family: 'IBM Plex Mono', monospace;
@@ -286,9 +239,8 @@
   transform: rotate(-1deg);
   transition: transform .15s ease, background .15s ease;
 }
-.clip-btn-primary:hover{ transform: rotate(0deg) translateY(-2px); background: var(--accent-mustard); }
+.clip-btn-primary:hover{ transform: rotate(0deg) translateY(-2px); background: var(--accent-mint); }
 
-/* botão secundário: texto discreto, sem caixa */
 .clip-btn-ghost{
   background: none;
   border: none;
@@ -304,57 +256,24 @@
 }
 .clip-btn-ghost:hover{ color: var(--accent-orange); }
 
-#clip-form-status{ font-size: 12px; color: var(--text-dim); }
-
-/* ---------- modal da clipada aleatória ---------- */
-.random-modal-box{
-  max-width: 460px;
-  text-align: center;
-}
-.random-label{
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--accent-mustard);
-  margin-bottom: 18px;
-}
-.random-card-wrap{
-  margin-bottom: 22px;
-}
-/* dentro do modal o card não deve rotacionar nem ter sombra decorativa
-   do grid original — fica "reto", como se fosse tirado pra mostrar */
-.random-card-wrap .clip-card{
-  transform: none !important;
-  box-shadow: 5px 5px 0 var(--bg-soft) !important;
-  text-align: left;
-  animation: card-reveal .35s ease;
-}
-@keyframes card-reveal{
-  from{ opacity: 0; transform: scale(.92) !important; }
-  to{ opacity: 1; transform: scale(1) !important; }
-}
-.random-modal-box .modal-actions{ justify-content: center; }
+#idea-form-status{ font-size: 12px; color: var(--text-dim); }
 
 /* =============================================================
    MOBILE — otimizado pra faixa do Samsung Galaxy A51/A71
    ============================================================= */
 @media (max-width: 480px){
-
-  .clip-hero{ padding-bottom: 30px; }
-
+  .can-hero{ padding-bottom: 30px; }
   .filter-row{ gap: 12px; margin-bottom: 26px; }
   .filter-btn{ font-size: 12.5px; padding: 10px 14px; }
-  .filter-list{ min-width: 180px; }
+  .filter-list{ min-width: 170px; }
   .filter-list li{ padding: 10px 14px; font-size: 12.5px; }
   .add-clip-btn{ width: 34px; height: 34px; font-size: 16px; }
-  .random-btn{ font-size: 11.5px; padding: 9px 13px; margin-left: 0; }
 
-  .clip-grid{ gap: 18px; }
-  .clip-card{ padding: 26px 16px 16px; }
-  .clip-card::after{ font-size: 8.5px; top: 7px; right: 11px; }
-  .clip-text{ font-size: 19px; margin-bottom: 14px; }
-  .clip-meta{ font-size: 11.5px; }
+  .idea-grid{ gap: 18px; }
+  .idea-card{ padding: 16px; gap: 10px; }
+  .idea-card h3{ font-size: 20px; }
+  .idea-card p.idea-body{ font-size: 13px; }
+  .idea-meta{ font-size: 11px; }
 
   .modal{ padding: 14px; }
   .modal-box{ padding: 22px 18px 18px; max-width: 100%; }

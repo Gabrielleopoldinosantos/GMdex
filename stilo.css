@@ -327,7 +327,7 @@ nav a:hover{ color: var(--accent-mint); }
 .friend h4{ font-size: 14px; margin-bottom:4px; font-family:'IBM Plex Mono'; font-weight:600;}
 .friend p{ font-size: 11.5px; color: var(--text-dim); }
 .friend .note{
-  font-family:'Caveat', cursive;
+  font-family: 'Caveat', cursive;
   font-size: 15px;
   color: var(--accent-mustard);
   margin-top: 8px;
@@ -388,3 +388,101 @@ footer .logo{ font-size: 20px; }
 .socials a{ color: var(--text-dim); font-size: 12px; text-decoration:none; letter-spacing:.5px; }
 .socials a:hover{ color: var(--accent-mint); }
 footer .fine{ font-size: 11px; color: var(--text-dim); margin-top: 10px; }
+
+/* =============================================================
+   MOBILE — otimizado pra faixa do Samsung Galaxy A51/A71
+   (~412px de largura CSS, ~892-914px de altura)
+   ============================================================= */
+@media (max-width: 480px){
+
+  .wrap{ padding: 0 16px; }
+
+  /* ---------- header ---------- */
+  .nav{
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    gap: 10px 14px;
+  }
+  .logo{ font-size: 20px; letter-spacing: 1px; }
+  .logo .dot{ width:8px; height:8px; }
+
+  nav{ order: 3; width: 100%; }
+  nav ul{
+    gap: 14px 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    padding-top: 4px;
+    border-top: 1px dashed var(--line);
+    padding-top: 10px;
+  }
+  nav a{ font-size: 12px; }
+
+  .auth-box{ margin-left: auto; }
+  .login-btn, .logout-btn{ font-size: 11px; padding: 8px 12px; }
+  .user-box{ font-size: 11px; gap: 6px; }
+  .user-avatar{ width: 22px; height:22px; }
+  .user-box #user-name{
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ---------- tela de login/bloqueio ---------- */
+  .locked-screen{
+    min-height: calc(100vh - 110px);
+    padding: 28px 18px;
+  }
+  .locked-box h2{ font-size: 26px; }
+  .locked-box p{ font-size: 13px; }
+  .rewind-btn{ width: 100%; justify-content: center; }
+
+  /* ---------- hero ---------- */
+  .hero{ padding: 48px 16px 40px; }
+  .hero .eyebrow{ font-size: 10.5px; letter-spacing: 2px; }
+  .hero h1{
+    font-size: clamp(30px, 9.5vw, 48px);
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  .hero h1 .type{ border-right-width: 2px; }
+  .hero .sub{ font-size: 13.5px; max-width: 100%; }
+  .rewind-btn{ margin-top: 26px; font-size: 12px; padding: 12px 18px; }
+
+  /* ---------- seções / labels ---------- */
+  .section-label{ margin-bottom: 26px; gap: 10px; }
+  .section-label span{ font-size: 17px; letter-spacing: 1px; }
+
+  /* ---------- board / cards ---------- */
+  .board{ padding: 48px 16px; }
+  .grid{ gap: 18px; }
+  .card{ padding: 16px; gap: 10px; }
+  .card h3{ font-size: 21px; }
+  .card p{ font-size: 13px; }
+  .card img.post-img{ height: 140px; }
+  .tape{ width: 46px; height:16px; left: 18px; }
+
+  /* ---------- turma ---------- */
+  .turma{ padding: 48px 16px 60px; }
+  .turma-grid{ justify-content: center; gap: 14px; }
+  .friend{ width: calc(50% - 7px); padding: 14px 10px; }
+  .friend h4{ font-size: 13px; }
+  .friend .note{ font-size: 13.5px; }
+
+  /* ---------- form de post ---------- */
+  .new-post{ padding: 30px 16px 0; }
+  .new-post form{ padding: 18px; max-width: 100%; }
+  .new-post button{ width: 100%; justify-self: stretch; text-align: center; }
+
+  /* ---------- footer ---------- */
+  footer{ padding: 26px 16px; }
+  .footer-inner{ flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+
+/* Faixa intermediária (tablets pequenos / telas um pouco maiores que o A51/A71) */
+@media (min-width: 481px) and (max-width: 600px){
+  .friend{ width: calc(50% - 11px); }
+  .hero h1{ font-size: clamp(36px, 9vw, 60px); word-break: break-word; }
+}
