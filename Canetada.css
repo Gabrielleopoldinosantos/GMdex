@@ -1,21 +1,52 @@
 /* -----------------------------------------------------------
-   CANETADA MILAGROSA — estilos específicos desta aba
+   CANETADA MILAGROSA — lista de tarefas
    (usa as variáveis de cor/fonte já definidas em stilo.css)
 ----------------------------------------------------------- */
 
 .can-hero{ padding-bottom: 50px; }
+.can-hero .s-done{ color: var(--accent-mint); text-decoration: line-through; text-decoration-color: var(--accent-mint); }
+.can-hero .s-rejected{ color: var(--accent-pink); }
 
-/* ---------- linha do filtro (reaproveita o dropdown das Clipadas) ---------- */
+/* ---------- linha de filtros ---------- */
 .filter-row{
   display:flex;
   align-items:center;
-  gap: 16px;
-  margin-bottom: 40px;
+  gap: 14px;
+  margin-bottom: 34px;
   flex-wrap: wrap;
 }
 
-.filter-wrap{ position: relative; }
+/* abas de status, tipo abas de checklist */
+.status-tabs{
+  display:flex;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  padding: 4px;
+}
+.status-tab{
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: .3px;
+  padding: 9px 14px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+  white-space: nowrap;
+}
+.status-tab:hover{ color: var(--text); }
+.status-tab.active{ background: var(--bg-soft); color: var(--text); }
+.status-tab[data-status="pendente"].active{ color: var(--accent-mustard); }
+.status-tab[data-status="finalizado"].active{ color: var(--accent-mint); }
+.status-tab[data-status="recusado"].active{ color: var(--accent-pink); }
 
+/* dropdown de categoria (reaproveita o padrão das Clipadas) */
+.filter-wrap{ position: relative; }
 .filter-btn{
   display:flex; align-items:center; gap:10px;
   background: var(--surface);
@@ -23,36 +54,29 @@
   color: var(--text);
   font-family: 'IBM Plex Mono', monospace;
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 13px;
   letter-spacing: .3px;
-  padding: 12px 18px;
+  padding: 10px 16px;
   border-radius: 30px;
   cursor: pointer;
   transition: border-color .2s ease, transform .15s ease;
 }
 .filter-btn:hover{ border-color: var(--accent-orange); transform: translateY(-1px); }
-.filter-btn[aria-expanded="true"]{ border-color: var(--accent-mint); }
-
+.filter-btn[aria-expanded="true"]{ border-color: var(--accent-mustard); }
 .filter-reel{
-  width: 14px; height:14px;
+  width: 12px; height:12px;
   border-radius: 50%;
   background: repeating-conic-gradient(var(--accent-mustard) 0deg 45deg, transparent 45deg 90deg);
   border: 1px solid var(--line);
   flex-shrink: 0;
 }
-
-.filter-caret{
-  color: var(--text-dim);
-  font-size: 11px;
-  transition: transform .2s ease;
-}
+.filter-caret{ color: var(--text-dim); font-size: 11px; transition: transform .2s ease; }
 .filter-btn[aria-expanded="true"] .filter-caret{ transform: rotate(180deg); }
-
 .filter-list{
   position:absolute;
   top: calc(100% + 8px);
   left: 0;
-  min-width: 190px;
+  min-width: 170px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -62,8 +86,8 @@
   z-index: 60;
 }
 .filter-list li{
-  padding: 11px 16px;
-  font-size: 13px;
+  padding: 10px 16px;
+  font-size: 12.5px;
   font-family: 'IBM Plex Mono', monospace;
   color: var(--text-dim);
   cursor: pointer;
@@ -75,14 +99,13 @@
 .filter-list li.active{ color: var(--accent-mustard); font-weight: 600; }
 .filter-list li.active::before{ content:"● "; font-size: 9px; }
 
-/* ---------- botão "+" discreto ---------- */
 .add-clip-btn{
-  width: 38px; height:38px;
+  width: 36px; height:36px;
   border-radius: 50%;
   border: 1px dashed var(--line);
   background: transparent;
   color: var(--text-dim);
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1;
   cursor: pointer;
   transition: color .15s ease, border-color .15s ease, transform .15s ease;
@@ -94,73 +117,117 @@
   transform: rotate(90deg);
 }
 
-/* ---------- cards de ideia ---------- */
-.idea-grid{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
-@media (max-width: 860px){ .idea-grid{ grid-template-columns: repeat(2,1fr); } }
-@media (max-width: 600px){ .idea-grid{ grid-template-columns: 1fr; } }
-
-.idea-card{
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  padding: 22px;
-  position: relative;
-  transition: transform .2s ease, border-color .2s ease;
-  display:flex; flex-direction:column; gap:12px;
-}
-.idea-card:nth-child(3n+1){ transform: rotate(-0.6deg); }
-.idea-card:nth-child(3n+2){ transform: rotate(0.5deg); }
-.idea-card:nth-child(3n+3){ transform: rotate(-0.3deg); }
-.idea-card:hover{ transform: rotate(0deg) translateY(-4px); border-color: var(--accent-mustard); }
-
-.idea-card .tape{
-  position:absolute; top:-10px; left: 24px;
-  width: 60px; height:20px;
-  background: linear-gradient(180deg, #d8cfae, #c9bd91);
-  opacity: .85;
-  transform: rotate(-3deg);
-  box-shadow: 0 2px 4px rgba(0,0,0,.35);
+/* ---------- lista de tarefas ---------- */
+.task-list{
+  display:flex;
+  flex-direction: column;
+  border-top: 1px dashed var(--line);
 }
 
-.idea-card h3{
+.task-item{
+  display:flex;
+  align-items:flex-start;
+  gap: 16px;
+  padding: 18px 6px;
+  border-bottom: 1px dashed var(--line);
+  transition: background .15s ease;
+}
+.task-item:hover{ background: var(--bg-soft); }
+
+/* bolinha de status: clicável só pra quem modera */
+.status-dot{
+  flex-shrink:0;
+  width: 26px; height:26px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: transparent;
+  display:flex; align-items:center; justify-content:center;
+  color: transparent;
+  font-size: 13px;
+  cursor: default;
+  margin-top: 2px;
+  transition: border-color .15s ease, background .15s ease, transform .15s ease;
+}
+.status-dot.can-moderate{ cursor: pointer; }
+.status-dot.can-moderate:hover{ transform: scale(1.08); border-color: var(--accent-mustard); }
+
+.task-item.status-pendente .status-dot{ border-color: var(--accent-mustard); }
+.task-item.status-finalizado .status-dot{ border-color: var(--accent-mint); background: var(--accent-mint); color: #1a1512; }
+.task-item.status-finalizado .status-dot::after{ content: "✓"; }
+.task-item.status-recusado .status-dot{ border-color: var(--accent-pink); background: transparent; color: var(--accent-pink); }
+.task-item.status-recusado .status-dot::after{ content: "✕"; }
+
+.task-main{ flex: 1; min-width: 0; }
+
+.task-top{
+  display:flex; align-items:center; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.task-title{
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 24px;
-  letter-spacing: .5px;
-  line-height: 1.05;
+  font-size: 20px;
+  letter-spacing: .3px;
+  line-height: 1.1;
 }
-.idea-card p.idea-body{
+.status-badge{
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.status-badge.finalizado{ background: #7fd1ae22; color: var(--accent-mint); border: 1px solid #7fd1ae55; }
+.status-badge.recusado{ background: #e8628c22; color: var(--accent-pink); border: 1px solid #e8628c55; }
+
+.task-text{
   font-size: 13.5px;
   color: var(--text-dim);
-  flex-grow:1;
+  margin-bottom: 8px;
 }
 
-.idea-meta{
-  display:flex; align-items:center; justify-content: space-between;
+.task-meta{
+  display:flex; align-items:center; gap: 10px;
   font-size: 11.5px;
   color: var(--text-dim);
-  border-top: 1px dashed var(--line);
-  padding-top: 12px;
 }
-.idea-author{ font-weight: 600; color: var(--accent-mustard); }
+.task-meta .task-author{ font-weight: 600; color: var(--accent-mustard); }
 
-.vote-btn{
-  display:flex; align-items:center; gap:6px;
+/* riscado quando finalizada; esmaecida quando recusada */
+.task-item.status-finalizado .task-title,
+.task-item.status-finalizado .task-text{
+  text-decoration: line-through;
+  text-decoration-color: var(--accent-mint);
+  opacity: .65;
+}
+.task-item.status-recusado{ opacity: .5; }
+.task-item.status-recusado .task-title{ text-decoration: line-through; text-decoration-color: var(--accent-pink); }
+
+/* ações de moderação — só aparecem pra quem está autorizado e logado */
+.task-actions{
+  display:flex; gap: 6px; flex-shrink: 0;
+  margin-top: 2px;
+}
+.mod-btn{
   background: transparent;
   border: 1px solid var(--line);
   color: var(--text-dim);
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
-  padding: 6px 10px;
+  padding: 6px 9px;
   border-radius: 20px;
   cursor: pointer;
   transition: border-color .15s ease, color .15s ease, transform .15s ease;
+  white-space: nowrap;
 }
-.vote-btn:hover{ border-color: var(--accent-mint); color: var(--accent-mint); transform: translateY(-1px); }
-.vote-btn.voted{ border-color: var(--accent-mint); color: var(--accent-mint); }
-.vote-btn .pen{ font-size: 13px; }
+.mod-btn:hover{ transform: translateY(-1px); }
+.mod-btn.finish:hover{ border-color: var(--accent-mint); color: var(--accent-mint); }
+.mod-btn.reject:hover{ border-color: var(--accent-pink); color: var(--accent-pink); }
+.mod-btn.reset:hover{ border-color: var(--accent-mustard); color: var(--accent-mustard); }
 
-/* ---------- modal (reaproveita a base das Clipadas) ---------- */
+/* ---------- modal (mesma base já usada no site) ---------- */
 .modal{
   position: fixed; inset:0;
   background: rgba(10,9,11,.72);
@@ -263,17 +330,20 @@
    ============================================================= */
 @media (max-width: 480px){
   .can-hero{ padding-bottom: 30px; }
-  .filter-row{ gap: 12px; margin-bottom: 26px; }
-  .filter-btn{ font-size: 12.5px; padding: 10px 14px; }
-  .filter-list{ min-width: 170px; }
-  .filter-list li{ padding: 10px 14px; font-size: 12.5px; }
-  .add-clip-btn{ width: 34px; height: 34px; font-size: 16px; }
 
-  .idea-grid{ gap: 18px; }
-  .idea-card{ padding: 16px; gap: 10px; }
-  .idea-card h3{ font-size: 20px; }
-  .idea-card p.idea-body{ font-size: 13px; }
-  .idea-meta{ font-size: 11px; }
+  .filter-row{ gap: 10px; margin-bottom: 24px; }
+  .status-tabs{ width: 100%; overflow-x: auto; justify-content: flex-start; }
+  .status-tab{ font-size: 11.5px; padding: 8px 11px; }
+  .filter-btn{ font-size: 12px; padding: 9px 13px; }
+  .add-clip-btn{ width: 32px; height: 32px; font-size: 15px; }
+
+  .task-item{ padding: 14px 4px; gap: 10px; }
+  .status-dot{ width: 22px; height:22px; font-size: 11px; }
+  .task-title{ font-size: 17px; }
+  .task-text{ font-size: 12.5px; }
+  .task-meta{ font-size: 10.5px; gap: 8px; }
+  .task-actions{ flex-direction: column; gap: 5px; }
+  .mod-btn{ font-size: 10px; padding: 5px 8px; }
 
   .modal{ padding: 14px; }
   .modal-box{ padding: 22px 18px 18px; max-width: 100%; }

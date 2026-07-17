@@ -17,44 +17,52 @@
     <div class="logo"><span class="dot"></span>GM — CANETADA</div>
     <nav>
       <ul>
-        <li><a href="index.html">INÍCIO</a></li>
         <li><a href="Clipadas.html">CLIPADAS</a></li>
+        <li><a href="index.html">INÍCIO</a></li>
         <li><a href="index.html#board">arquivo</a></li>
         <li><a href="Clipadas.html">clipadas</a></li>
         <li><a href="#canetada">canetada</a></li>
         <li><a href="index.html#footer">contato</a></li>
       </ul>
     </nav>
+    <!-- login é opcional aqui: só serve pra liberar os botões de mover
+         status (finalizar/recusar) pra quem estiver em "authorized_posters".
+         Ninguém precisa logar pra ver a lista ou sugerir ideia. -->
+    <div class="auth-box" id="auth-box">
+      <button id="login-btn" class="login-btn">Entrar com Google</button>
+      <div id="user-box" class="user-box" style="display:none;">
+        <img id="user-avatar" class="user-avatar" src="" alt="">
+        <span id="user-name"></span>
+        <button id="logout-btn" class="logout-btn">Sair</button>
+      </div>
+    </div>
   </div>
 </header>
 
-<!-- Esta página é aberta: sem tela de login, qualquer um pode ver e sugerir -->
 <div id="app-content">
 
   <section class="hero can-hero">
     <div class="eyebrow">livre pra todo mundo</div>
     <h1>CANETADA MILAGROSA</h1>
-    <p class="sub">Teve alguma <strong>ideia foda pra adicionar pro bagui aqui</strong>? Solta aqui embaixo. Sem login, sem burocracia, só caneta e me ajuda please.</p>
+    <p class="sub">Teve uma <strong>ideia foda pra botar no bagui</strong>?   Solta aqui embaixo e me ajuda... please
   </section>
 
   <section class="board" id="canetada">
 
     <div class="filter-row">
-      <div class="filter-wrap">
-        <button id="filter-btn" class="filter-btn" aria-haspopup="listbox" aria-expanded="false">
-          <span class="filter-reel"></span>
-          <span id="filter-label">Todas</span>
-          <span class="filter-caret">▾</span>
-        </button>
-        <ul id="filter-list" class="filter-list hidden" role="listbox"></ul>
+      <div class="status-tabs" id="status-tabs" role="tablist">
+        <button class="status-tab active" data-status="todas">Todas</button>
+        <button class="status-tab" data-status="pendente">Pendentes</button>
+        <button class="status-tab" data-status="finalizado">Finalizadas</button>
+        <button class="status-tab" data-status="recusado">Recusadas</button>
       </div>
 
       <button id="add-idea-btn" class="add-clip-btn" title="Sugerir ideia" aria-label="Sugerir ideia">+</button>
     </div>
 
-    <div class="grid idea-grid" id="idea-grid"></div>
+    <div class="task-list" id="idea-list"></div>
     <p id="idea-empty" style="display:none; color:var(--text-dim); font-size:13px;">
-      Nenhuma ideia ainda. Sê o primeiro a canetar 👇
+      Nenhuma ideia por aqui ainda. Sê o primeiro a canetar 👇
     </p>
 
   </section>
@@ -74,16 +82,6 @@
       <div>
         <label for="idea-text">Do que se trata</label>
         <textarea id="idea-text" name="text" required maxlength="600" placeholder="desenrola a ideia aqui..."></textarea>
-      </div>
-      <div>
-        <label for="idea-tag">Categoria</label>
-        <select id="idea-tag" name="tag">
-          <option value="jogos">jogos</option>
-          <option value="receita">receita</option>
-          <option value="filme">filme</option>
-          <option value="role">rolê</option>
-          <option value="outro">outro</option>
-        </select>
       </div>
       <div>
         <label for="idea-author">De quem é (opcional)</label>

@@ -11,9 +11,16 @@ import {
   orderBy,
   serverTimestamp,
   doc,
-  updateDoc,
-  increment
+  getDoc,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDlf8DbGIuegwk5eKrBe_u9Vsv3cOU4tT4",
@@ -26,154 +33,164 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
 
-// Esta página é aberta pra todo mundo: sem login, sem checagem de permissão.
-// Qualquer visitante pode ver e sugerir ideias direto.
+// Esta página é ABERTA: qualquer um vê a lista e sugere ideia, sem login.
+// O login aqui só serve pra liberar os botões de mover status
+// (finalizar / recusar / reabrir), restritos a quem está em "authorized_posters".
 
-const TAGS = [
-  { key: "jogos", label: "jogos" },
-  { key: "receita", label: "receita" },
-  { key: "filme", label: "filme" },
-  { key: "role", label: "rolê" },
-  { key: "outro", label: "outro" }
-];
-
-let currentFilter = "todas";
-let allIdeas = []; // cache local, cada item já tem seu id do doc
+let currentStatusFilter = "todas";
+let canModerate = false;
+let allIdeas = [];
 
 // ---------------------------------------------------------
-// VOTOS — guardados no navegador, pra não deixar votar 2x na mesma ideia
-// (não exige login, é só um controle local simples)
+// AUTENTICAÇÃO (opcional, só pra moderação)
 // ---------------------------------------------------------
-const VOTED_KEY = "gm_canetada_votadas";
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const userBox = document.getElementById("user-box");
+const userNameEl = document.getElementById("user-name");
+const userAvatarEl = document.getElementById("user-avatar");
 
-function getVotedIds() {
+async function doLogin() {
   try {
-    return new Set(JSON.parse(localStorage.getItem(VOTED_KEY) || "[]"));
-  } catch {
-    return new Set();
+    await signInWithPopup(auth, provider);
+  } catch (err) {
+    console.error("[canetada] Erro no login:", err.code, err.message);
   }
 }
 
-function markVoted(id) {
-  const voted = getVotedIds();
-  voted.add(id);
-  localStorage.setItem(VOTED_KEY, JSON.stringify([...voted]));
+loginBtn?.addEventListener("click", doLogin);
+logoutBtn?.addEventListener("click", () => signOut(auth));
+
+async function checkCanModerate(uid) {
+  try {
+    const snap = await getDoc(doc(db, "authorized_posters", uid));
+    return snap.exists();
+  } catch (err) {
+    console.error("Erro ao checar permissão de moderação:", err);
+    return false;
+  }
 }
 
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    loginBtn.style.display = "none";
+    userBox.style.display = "flex";
+    userNameEl.textContent = user.displayName || user.email || "sem nome";
+    userAvatarEl.src = user.photoURL || "";
+    canModerate = await checkCanModerate(user.uid);
+  } else {
+    loginBtn.style.display = "";
+    userBox.style.display = "none";
+    canModerate = false;
+  }
+  renderIdeas();
+});
+
 // ---------------------------------------------------------
-// DROPDOWN DE FILTRO
+// FILTRO DE STATUS (abas)
 // ---------------------------------------------------------
-const filterBtn = document.getElementById("filter-btn");
-const filterLabel = document.getElementById("filter-label");
-const filterList = document.getElementById("filter-list");
+const statusTabs = document.querySelectorAll(".status-tab");
+statusTabs.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    currentStatusFilter = tab.dataset.status;
+    statusTabs.forEach((t) => t.classList.toggle("active", t === tab));
+    renderIdeas();
+  });
+});
+
 const addIdeaBtn = document.getElementById("add-idea-btn");
 
-function buildFilterList() {
-  const items = [{ key: "todas", label: "Todas" }, ...TAGS];
-  filterList.innerHTML = "";
-  items.forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = item.label;
-    li.dataset.key = item.key;
-    li.setAttribute("role", "option");
-    if (item.key === currentFilter) li.classList.add("active");
-    li.addEventListener("click", () => selectFilter(item.key, item.label));
-    filterList.appendChild(li);
-  });
-}
-
-function selectFilter(key, label) {
-  currentFilter = key;
-  filterLabel.textContent = label;
-  filterList.classList.add("hidden");
-  filterBtn.setAttribute("aria-expanded", "false");
-  [...filterList.children].forEach((li) => li.classList.toggle("active", li.dataset.key === key));
-  renderIdeas();
-}
-
-filterBtn.addEventListener("click", () => {
-  const isOpen = !filterList.classList.contains("hidden");
-  filterList.classList.toggle("hidden", isOpen);
-  filterBtn.setAttribute("aria-expanded", String(!isOpen));
-});
-
-document.addEventListener("click", (e) => {
-  if (!filterBtn.contains(e.target) && !filterList.contains(e.target)) {
-    filterList.classList.add("hidden");
-    filterBtn.setAttribute("aria-expanded", "false");
-  }
-});
-
-buildFilterList();
-
 // ---------------------------------------------------------
-// CARREGA E RENDERIZA AS IDEIAS
+// CARREGA E RENDERIZA A LISTA
 // ---------------------------------------------------------
-const ideaGrid = document.getElementById("idea-grid");
+const ideaList = document.getElementById("idea-list");
 const ideaEmpty = document.getElementById("idea-empty");
 
-function renderCard(idea) {
-  const votedIds = getVotedIds();
-  const alreadyVoted = votedIds.has(idea.id);
-
-  const card = document.createElement("div");
-  card.className = "idea-card";
-  card.innerHTML = `
-    <div class="tape"></div>
-    <span class="tag ${idea.tag || "outro"}">${idea.tag || "outro"}</span>
-    <h3>${idea.title || "(sem título)"}</h3>
-    <p class="idea-body">${idea.text || ""}</p>
-    <div class="idea-meta">
-      <span class="idea-author">${idea.author || "anônimo"}</span>
-      <button class="vote-btn ${alreadyVoted ? "voted" : ""}" data-id="${idea.id}">
-        <span class="pen">🖋️</span> ${idea.votes || 0}
-      </button>
-    </div>
-  `;
-
-  const voteBtn = card.querySelector(".vote-btn");
-  voteBtn.addEventListener("click", () => handleVote(idea.id, voteBtn));
-
-  return card;
+function formatDate(timestamp) {
+  if (!timestamp) return "";
+  const d = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
 }
 
-async function handleVote(id, btn) {
-  const votedIds = getVotedIds();
-  if (votedIds.has(id)) return; // já votou nessa
+function renderRow(idea) {
+  const status = idea.status || "pendente";
 
-  btn.disabled = true;
+  const row = document.createElement("div");
+  row.className = `task-item status-${status}`;
+  row.dataset.id = idea.id;
+
+  const badge = status === "finalizado"
+    ? `<span class="status-badge finalizado">finalizada</span>`
+    : status === "recusado"
+      ? `<span class="status-badge recusado">recusada</span>`
+      : "";
+
+  row.innerHTML = `
+    <button class="status-dot ${canModerate ? "can-moderate" : ""}" aria-label="mudar status"></button>
+    <div class="task-main">
+      <div class="task-top">
+        <h4 class="task-title">${idea.title || "(sem título)"}</h4>
+        ${badge}
+      </div>
+      <p class="task-text">${idea.text || ""}</p>
+      <div class="task-meta">
+        <span class="task-author">${idea.author || "anônimo"}</span>
+        <span>${formatDate(idea.createdAt)}</span>
+      </div>
+    </div>
+    ${canModerate ? `
+    <div class="task-actions">
+      <button class="mod-btn finish" data-action="finalizado">✓ Finalizar</button>
+      <button class="mod-btn reject" data-action="recusado">✕ Recusar</button>
+      ${status !== "pendente" ? `<button class="mod-btn reset" data-action="pendente">↺ Reabrir</button>` : ""}
+    </div>` : ""}
+  `;
+
+  if (canModerate) {
+    const dot = row.querySelector(".status-dot");
+    dot.addEventListener("click", () => cycleStatus(idea));
+    row.querySelectorAll(".mod-btn").forEach((btn) => {
+      btn.addEventListener("click", () => setStatus(idea, btn.dataset.action));
+    });
+  }
+
+  return row;
+}
+
+async function cycleStatus(idea) {
+  const order = ["pendente", "finalizado", "recusado"];
+  const current = idea.status || "pendente";
+  const next = order[(order.indexOf(current) + 1) % order.length];
+  await setStatus(idea, next);
+}
+
+async function setStatus(idea, newStatus) {
+  if (!canModerate) return;
   try {
-    await updateDoc(doc(db, "ideias", id), { votes: increment(1) });
-    markVoted(id);
-
-    const idea = allIdeas.find((i) => i.id === id);
-    if (idea) idea.votes = (idea.votes || 0) + 1;
-
-    btn.classList.add("voted");
-    btn.innerHTML = `<span class="pen">🖋️</span> ${idea ? idea.votes : ""}`;
+    await updateDoc(doc(db, "ideias", idea.id), { status: newStatus });
+    idea.status = newStatus;
+    renderIdeas();
   } catch (err) {
-    console.error("Erro ao votar:", err);
-  } finally {
-    btn.disabled = false;
+    console.error("Erro ao mudar status:", err);
   }
 }
 
 function renderIdeas() {
-  const filtered = currentFilter === "todas"
-    ? allIdeas
-    : allIdeas.filter((i) => i.tag === currentFilter);
+  let filtered = allIdeas;
+  if (currentStatusFilter !== "todas") {
+    filtered = filtered.filter((i) => (i.status || "pendente") === currentStatusFilter);
+  }
 
-  // ordena por votos (mais votadas primeiro), depois por data
-  const sorted = [...filtered].sort((a, b) => (b.votes || 0) - (a.votes || 0));
-
-  ideaGrid.innerHTML = "";
-  if (sorted.length === 0) {
+  ideaList.innerHTML = "";
+  if (filtered.length === 0) {
     ideaEmpty.style.display = "block";
     return;
   }
   ideaEmpty.style.display = "none";
-  sorted.forEach((idea) => ideaGrid.appendChild(renderCard(idea)));
+  filtered.forEach((idea) => ideaList.appendChild(renderRow(idea)));
 }
 
 async function loadIdeas() {
@@ -220,7 +237,6 @@ ideaForm.addEventListener("submit", async (e) => {
 
   const title = ideaForm.title.value.trim();
   const text = ideaForm.text.value.trim();
-  const tag = ideaForm.tag.value;
   const author = ideaForm.author.value.trim();
 
   if (!title || !text) {
@@ -234,9 +250,8 @@ ideaForm.addEventListener("submit", async (e) => {
     await addDoc(collection(db, "ideias"), {
       title,
       text,
-      tag,
       author: author || "anônimo",
-      votes: 0,
+      status: "pendente",
       createdAt: serverTimestamp()
     });
 
