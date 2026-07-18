@@ -6,7 +6,7 @@
 <title>GM — CLIPADAS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@400..700&family=Indie+Flower&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="stilo.css">
 <link rel="stylesheet" href="Clipadas.css">
 </head>
@@ -20,7 +20,6 @@
         <li><a href="index.html">INÍCIO</a></li>
         <li><a href="Canetada.html">CANETADA</a></li>
         <li><a href="index.html#board">arquivo</a></li>
-        <li><a href="#clipadas">clipadas</a></li>
         <li><a href="index.html#turma">a turma</a></li>
         <li><a href="index.html#footer">contato</a></li>
       </ul>
@@ -69,6 +68,15 @@
           <span class="filter-caret">▾</span>
         </button>
         <ul id="filter-list" class="filter-list hidden" role="listbox"></ul>
+      </div>
+
+      <div class="filter-wrap">
+        <button id="year-filter-btn" class="filter-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span class="filter-reel"></span>
+          <span id="year-filter-label">Ano</span>
+          <span class="filter-caret">▾</span>
+        </button>
+        <ul id="year-filter-list" class="filter-list hidden" role="listbox"></ul>
       </div>
 
       <button id="random-clip-btn" class="random-btn" title="Clipada aleatória" aria-label="Sortear clipada aleatória">

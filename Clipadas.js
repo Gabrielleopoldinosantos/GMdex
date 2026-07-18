@@ -40,19 +40,30 @@ const provider = new GoogleAuthProvider();
 // (ordem alfabética, "Recentes" é tratado à parte e vem primeiro)
 // ---------------------------------------------------------
 const AUTHORS = [
-  { key: "delta", label: "Delta" },
-  { key: "feitzz", label: "Feitzz" },
-  { key: "jhonjhon", label: "Jhon Jhon" },
-  { key: "leopoldino", label: "Leopoldino" },
-  { key: "levizao", label: "Levizão" },
-  { key: "ptn", label: "PTN" },
-  { key: "vitao", label: "Vitão" }
+  { key: "victoria julya", label: "Victoria Julya" },
+  { key: "menezes gabriel", label: "Menezes Gabriel" },
+  { key: "kaua johnny", label: "Kauã Johnny" },
+  { key: "leopoldino gabriel", label: "Leopoldino Gabriel" },
+  { key: "souza levi", label: "Souza Levi" },
+  { key: "pecin, joão", label: "Pecin João" },
+  { key: "antunes vitor", label: "Antunes Vitor" },
+  { key: "heloisa maria", label: "Heloisa Maria" },
+  { key: "coisax", label: "Coisax" },
+  { key: "seu wilson", label: "Seu Wilson" },
+  { key: "natalia vice diretora", label: "Natália Vice Diretora" },
+  { key: "rogerio", label: "Rogerio" },
+  { key: "loucao", label: "Loucão" },
+  { key: "vinicao", label: "Vinição" },
+  { key: "baldin ryan", label: "Baldin Ryan" },
+  { key: "luciana", label: "Luciana" },
+  { key: "primo do pecin", label: "Primo do Pecin" },
 ];
 
-let currentFilter = "recentes"; // chave do filtro ativo
+let currentFilter = "recentes";   // filtro de autor
+let currentYearFilter = "todos";  // filtro de ano
 let canPost = false;
-let allClips = []; // cache local de tudo que veio do Firestore
-let lastRandomIndex = -1; // pra tentar não repetir a mesma clipada duas vezes seguidas
+let allClips = []; // cache local, sempre em ordem desc (mais nova primeiro), com .number já calculado
+let lastRandomIndex = -1;
 
 // ---------------------------------------------------------
 // ELEMENTOS DE AUTENTICAÇÃO / GATE DE ACESSO
@@ -82,8 +93,6 @@ loginBtn?.addEventListener("click", doLogin);
 loginBtn2?.addEventListener("click", doLogin);
 logoutBtn?.addEventListener("click", () => signOut(auth));
 
-// Mesma checagem de permissão usada na página principal:
-// coleção "authorized_posters" (doc ID = UID do usuário)
 async function checkCanPost(uid) {
   try {
     const snap = await getDoc(doc(db, "authorized_posters", uid));
@@ -116,7 +125,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // ---------------------------------------------------------
-// DROPDOWN DE FILTRO
+// DROPDOWN DE FILTRO — AUTOR
 // ---------------------------------------------------------
 const filterBtn = document.getElementById("filter-btn");
 const filterLabel = document.getElementById("filter-label");
@@ -152,14 +161,60 @@ filterBtn.addEventListener("click", () => {
   filterBtn.setAttribute("aria-expanded", String(!isOpen));
 });
 
+buildFilterList();
+
+// ---------------------------------------------------------
+// DROPDOWN DE FILTRO — ANO
+// (as opções são montadas a partir dos anos que existem nas clipadas)
+// ---------------------------------------------------------
+const yearFilterBtn = document.getElementById("year-filter-btn");
+const yearFilterLabel = document.getElementById("year-filter-label");
+const yearFilterList = document.getElementById("year-filter-list");
+
+function buildYearFilterList() {
+  const years = [...new Set(allClips.map((c) => c.year).filter(Boolean))]
+    .sort((a, b) => Number(b) - Number(a)); // mais recente primeiro
+
+  const items = [{ key: "todos", label: "Todos os anos" }, ...years.map((y) => ({ key: y, label: y }))];
+
+  yearFilterList.innerHTML = "";
+  items.forEach((item) => {
+    const li = document.createElement("li");
+    li.textContent = item.label;
+    li.dataset.key = item.key;
+    li.setAttribute("role", "option");
+    if (item.key === currentYearFilter) li.classList.add("active");
+    li.addEventListener("click", () => selectYearFilter(item.key, item.label));
+    yearFilterList.appendChild(li);
+  });
+}
+
+function selectYearFilter(key, label) {
+  currentYearFilter = key;
+  yearFilterLabel.textContent = key === "todos" ? "Ano" : label;
+  yearFilterList.classList.add("hidden");
+  yearFilterBtn.setAttribute("aria-expanded", "false");
+  [...yearFilterList.children].forEach((li) => li.classList.toggle("active", li.dataset.key === key));
+  renderClipadas();
+}
+
+yearFilterBtn.addEventListener("click", () => {
+  const isOpen = !yearFilterList.classList.contains("hidden");
+  yearFilterList.classList.toggle("hidden", isOpen);
+  yearFilterBtn.setAttribute("aria-expanded", String(!isOpen));
+});
+
+// fecha qualquer dropdown aberto ao clicar fora
 document.addEventListener("click", (e) => {
   if (!filterBtn.contains(e.target) && !filterList.contains(e.target)) {
     filterList.classList.add("hidden");
     filterBtn.setAttribute("aria-expanded", "false");
   }
+  if (!yearFilterBtn.contains(e.target) && !yearFilterList.contains(e.target)) {
+    yearFilterList.classList.add("hidden");
+    yearFilterBtn.setAttribute("aria-expanded", "false");
+  }
 });
-
-buildFilterList();
 
 // ---------------------------------------------------------
 // CARREGA E RENDERIZA AS CLIPADAS
@@ -167,10 +222,10 @@ buildFilterList();
 const clipGrid = document.getElementById("clip-grid");
 const clipEmpty = document.getElementById("clip-empty");
 
-function renderCard(clip, index) {
+function renderCard(clip) {
   const card = document.createElement("div");
   card.className = "clip-card";
-  card.dataset.index = String(index + 1).padStart(3, "0");
+  card.dataset.index = String(clip.number).padStart(3, "0");
   card.innerHTML = `
     <div class="tape"></div>
     <p class="clip-text">${clip.text || ""}</p>
@@ -183,9 +238,13 @@ function renderCard(clip, index) {
 }
 
 function renderClipadas() {
-  const filtered = currentFilter === "recentes"
+  let filtered = currentFilter === "recentes"
     ? allClips
     : allClips.filter((c) => c.authorKey === currentFilter);
+
+  if (currentYearFilter !== "todos") {
+    filtered = filtered.filter((c) => c.year === currentYearFilter);
+  }
 
   clipGrid.innerHTML = "";
   if (filtered.length === 0) {
@@ -193,16 +252,24 @@ function renderClipadas() {
     return;
   }
   clipEmpty.style.display = "none";
-  filtered.forEach((clip, i) => clipGrid.appendChild(renderCard(clip, i)));
+  filtered.forEach((clip) => clipGrid.appendChild(renderCard(clip)));
 }
 
 async function loadClipadas() {
   try {
-    // Só um orderBy (sem where), então não precisa de índice composto no Firestore.
-    // O filtro por autor é feito no cliente em renderClipadas().
+    // Busca sempre da mais nova pra mais velha.
     const q = query(collection(db, "clipadas"), orderBy("createdAt", "desc"));
     const snapshot = await getDocs(q);
     allClips = snapshot.docs.map((d) => d.data());
+
+    // Numeração cronológica: a mais velha (último item do array, já que
+    // está em ordem desc) recebe o #1; a mais nova recebe o número mais alto.
+    const total = allClips.length;
+    allClips.forEach((clip, i) => {
+      clip.number = total - i;
+    });
+
+    buildYearFilterList();
     renderClipadas();
   } catch (err) {
     console.error("Erro ao carregar clipadas:", err);
@@ -233,8 +300,6 @@ function openModal() {
   clipFormStatus.textContent = "";
   clipForm.reset();
 
-  // Se um autor específico já está selecionado no filtro, trava nele.
-  // Só em "Recentes" o usuário escolhe de quem é a clipada.
   if (currentFilter === "recentes") {
     authorSelectWrap.style.display = "";
   } else {
@@ -308,7 +373,6 @@ function pickRandomClip() {
   if (allClips.length === 0) return null;
   if (allClips.length === 1) return allClips[0];
 
-  // sorteia um índice diferente do último mostrado, pra não repetir seguido
   let idx;
   do {
     idx = Math.floor(Math.random() * allClips.length);
@@ -324,7 +388,7 @@ function showRandomClip() {
   if (!pick) {
     randomCardWrap.innerHTML = `<p style="color:var(--text-dim); font-size:13.5px;">Ainda não tem nenhuma clipada registrada pra sortear.</p>`;
   } else {
-    randomCardWrap.appendChild(renderCard(pick, 0));
+    randomCardWrap.appendChild(renderCard(pick));
   }
 
   randomModal.classList.remove("hidden");
