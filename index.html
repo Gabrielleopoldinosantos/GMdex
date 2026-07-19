@@ -62,13 +62,36 @@
   </section>
 
   <section class="board" id="board">
-    <div class="section-label"><span>último lançamento</span><div class="rule"></div></div>
+    <div class="section-label"><span>arquivo de posts</span><div class="rule"></div></div>
+
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="search" id="post-search" class="search-box" placeholder="Pesquisar posts por título ou texto...">
+    </div>
+
+    <div class="filter-row">
+      <div class="status-tabs" id="category-tabs" role="tablist">
+        <button class="status-tab active" data-tag="todas">Todas</button>
+        <button class="status-tab" data-tag="jogos">Jogos</button>
+        <button class="status-tab" data-tag="receita">Receita</button>
+        <button class="status-tab" data-tag="filme">Filme</button>
+        <button class="status-tab" data-tag="role">Rolê</button>
+        <button class="status-tab" data-tag="memes">Memes</button>
+        <button class="status-tab" data-tag="musica">Música</button>
+        <button class="status-tab" data-tag="arte">Arte</button>
+        <button class="status-tab" data-tag="outros">Outros</button>
+      </div>
+      <span class="post-count" id="post-count"></span>
+    </div>
 
     <!-- Os posts abaixo são carregados dinamicamente do Firestore pelo script.js -->
     <div class="grid" id="posts-grid"></div>
     <p id="posts-empty" style="display:none; color:var(--text-dim); font-size:13px;">
       Nenhum post ainda. Seja o primeiro a postar ali embaixo 👇
     </p>
+    <button id="load-more-btn" class="load-more-btn hidden">Mostrar mais posts</button>
   </section>
 
   <section class="new-post" id="novo">
@@ -89,11 +112,18 @@
           <option value="receita">receita</option>
           <option value="filme">filme</option>
           <option value="role">rolê</option>
+          <option value="memes">memes</option>
+          <option value="musica">música</option>
+          <option value="arte">arte</option>
+          <option value="outros">outros</option>
         </select>
       </div>
       <div>
-        <label for="image">Imagem (opcional)</label>
-        <input type="file" id="image" name="image" accept="image/*">
+        <label for="image">Imagens ou vídeos (opcional, até 4 arquivos, 20MB cada)</label>
+        <input type="file" id="image" name="image" accept="image/*,video/*" multiple>
+        <div class="upload-progress" id="upload-progress">
+          <div class="upload-progress-bar" id="upload-progress-bar"></div>
+        </div>
       </div>
       <button type="submit">Publicar</button>
       <span id="form-status"></span>
@@ -162,6 +192,53 @@
     </div>
   </footer>
 
+</div>
+
+<!-- Modal de edição de post (só pra quem publicou) -->
+<div id="edit-modal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-tape"></div>
+    <h3>Editar post</h3>
+    <form id="edit-form">
+      <div>
+        <label for="edit-title">Título</label>
+        <input type="text" id="edit-title" name="title" required maxlength="120">
+      </div>
+      <div>
+        <label for="edit-text">Texto</label>
+        <textarea id="edit-text" name="text" required></textarea>
+      </div>
+      <div>
+        <label for="edit-tag">Categoria</label>
+        <select id="edit-tag" name="tag">
+          <option value="jogos">jogos</option>
+          <option value="receita">receita</option>
+          <option value="filme">filme</option>
+          <option value="role">rolê</option>
+          <option value="memes">memes</option>
+          <option value="musica">música</option>
+          <option value="arte">arte</option>
+          <option value="outros">outros</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="submit" class="clip-btn-primary">Salvar alterações</button>
+        <button type="button" id="edit-modal-close" class="clip-btn-ghost">Cancelar</button>
+      </div>
+      <span id="edit-form-status"></span>
+    </form>
+  </div>
+</div>
+
+<!-- Lightbox: abre a mídia de um post em tela cheia -->
+<div id="lightbox" class="lightbox hidden">
+  <div class="lightbox-stage" id="lightbox-stage">
+    <button type="button" class="lightbox-nav prev" id="lightbox-prev" aria-label="Mídia anterior">‹</button>
+    <div id="lightbox-media"></div>
+    <button type="button" class="lightbox-nav next" id="lightbox-next" aria-label="Próxima mídia">›</button>
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Fechar">✕</button>
+    <span class="lightbox-counter" id="lightbox-counter"></span>
+  </div>
 </div>
 
 <script type="module" src="script.js"></script>

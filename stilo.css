@@ -212,6 +212,110 @@ nav a:hover{ color: var(--accent-mint); }
 
 .board{ padding: 80px 28px; max-width: 1080px; margin: 0 auto; }
 
+/* ---------- abas de categoria (index) ---------- */
+.filter-row{
+  display:flex;
+  align-items:center;
+  margin-bottom: 34px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.status-tabs{
+  display:flex;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  padding: 4px;
+  flex-wrap: wrap;
+}
+.status-tab{
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: .3px;
+  padding: 9px 16px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+  white-space: nowrap;
+}
+.status-tab:hover{ color: var(--text); }
+.status-tab.active{ background: var(--bg-soft); color: var(--text); }
+.status-tab[data-tag="jogos"].active{ color: var(--accent-pink); }
+.status-tab[data-tag="receita"].active{ color: var(--accent-mustard); }
+.status-tab[data-tag="filme"].active{ color: var(--accent-orange); }
+.status-tab[data-tag="role"].active{ color: #b3a7ff; }
+.status-tab[data-tag="memes"].active{ color: var(--accent-mint); }
+.status-tab[data-tag="musica"].active{ color: #5ec8ff; }
+.status-tab[data-tag="arte"].active{ color: #c98bff; }
+.status-tab[data-tag="outros"].active{ color: #c9bd91; }
+
+/* ---------- barra de pesquisa ---------- */
+.search-wrap{
+  position: relative;
+  margin-bottom: 18px;
+}
+.search-icon{
+  position: absolute;
+  left: 16px; top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height:16px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.search-box{
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13.5px;
+  padding: 12px 16px 12px 42px;
+  border-radius: 30px;
+  transition: border-color .2s ease;
+}
+.search-box::placeholder{ color: var(--text-dim); }
+.search-box:focus{ outline: none; border-color: var(--accent-orange); }
+/* botão nativo de "limpar" do input search, recolorido pro tema escuro */
+.search-box::-webkit-search-cancel-button{ filter: invert(1) opacity(.5); cursor: pointer; }
+
+.post-count{
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-left: auto;
+}
+
+.load-more-btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 40px auto 0;
+  background: var(--accent-mustard);
+  color: #1a1512;
+  border: 2px solid #1a1512;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 13.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 14px 30px;
+  border-radius: 3px;
+  cursor: pointer;
+  transform: rotate(-1deg);
+  box-shadow: 5px 5px 0 var(--bg-soft);
+  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.load-more-btn:hover{
+  background: var(--accent-orange);
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: 5px 8px 0 var(--bg-soft);
+}
+.load-more-btn.hidden{ display: none; }
+
 .grid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
@@ -256,6 +360,10 @@ nav a:hover{ color: var(--accent-mint); }
 .tag.receita{ background: #f2c14e22; color: var(--accent-mustard); border:1px solid #f2c14e55; }
 .tag.filme{ background: #ff7a4522; color: var(--accent-orange); border:1px solid #ff7a4555; }
 .tag.role{ background: #9d8cff22; color: #b3a7ff; border:1px solid #9d8cff55; }
+.tag.memes{ background: #7fd1ae22; color: var(--accent-mint); border:1px solid #7fd1ae55; }
+.tag.musica{ background: #5ec8ff22; color: #5ec8ff; border:1px solid #5ec8ff55; }
+.tag.arte{ background: #c98bff22; color: #c98bff; border:1px solid #c98bff55; }
+.tag.outros{ background: #c9bd9122; color: #c9bd91; border:1px solid #c9bd9155; }
 
 .card h3{
   font-family: 'Bebas Neue', sans-serif;
@@ -268,13 +376,108 @@ nav a:hover{ color: var(--accent-mint); }
   color: var(--text-dim);
   flex-grow:1;
 }
-.card img.post-img{
-  width: 100%;
+
+/* ---------- mídia dos posts (1 a 4 itens: imagem e/ou vídeo) ---------- */
+.post-media{
+  display:grid;
+  gap: 3px;
   height: 160px;
-  object-fit: cover;
   border-radius: 3px;
+  overflow: hidden;
   border: 1px solid var(--line);
 }
+.post-media.count-1{ grid-template-columns: 1fr; }
+.post-media.count-2{ grid-template-columns: 1fr 1fr; }
+.post-media.count-3{ grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.post-media.count-3 > *:first-child{ grid-row: 1 / 3; }
+.post-media.count-4{ grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.post-media img,
+.post-media video{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  background: #000;
+  cursor: zoom-in;
+  transition: filter .15s ease;
+}
+.post-media img:hover,
+.post-media video:hover{ filter: brightness(1.08); }
+
+/* ---------- lightbox: abrir mídia do post em tela cheia ---------- */
+.lightbox{
+  position: fixed; inset: 0;
+  background: rgba(10,9,11,.92);
+  display:flex; align-items:center; justify-content:center;
+  z-index: 300;
+  padding: 40px;
+}
+.lightbox.hidden{ display:none; }
+.lightbox-stage{
+  position: relative;
+  max-width: min(92vw, 1100px);
+  max-height: 88vh;
+  display:flex; align-items:center; justify-content:center;
+}
+.lightbox-stage img,
+.lightbox-stage video{
+  max-width: 100%;
+  max-height: 88vh;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  box-shadow: 0 20px 60px rgba(0,0,0,.6);
+  display:block;
+}
+.lightbox-close{
+  position: absolute;
+  top: -18px; right: -18px;
+  width: 36px; height:36px;
+  border-radius: 50%;
+  background: var(--accent-mustard);
+  color: #1a1512;
+  border: 2px solid #1a1512;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition: transform .15s ease;
+}
+.lightbox-close:hover{ transform: scale(1.08) rotate(90deg); }
+.lightbox-nav{
+  position: absolute;
+  top: 50%; transform: translateY(-50%);
+  width: 44px; height:44px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition: border-color .15s ease, transform .15s ease;
+}
+.lightbox-nav:hover{ border-color: var(--accent-orange); }
+.lightbox-nav.prev{ left: -60px; }
+.lightbox-nav.next{ right: -60px; }
+.lightbox-counter{
+  position: absolute;
+  bottom: -32px; left: 50%;
+  transform: translateX(-50%);
+  font-size: 11.5px;
+  color: var(--text-dim);
+  letter-spacing: .5px;
+}
+
+@media (max-width: 700px){
+  .lightbox{ padding: 16px; }
+  .lightbox-nav.prev{ left: 4px; }
+  .lightbox-nav.next{ right: 4px; }
+  .lightbox-nav{ width: 38px; height:38px; background: rgba(37,36,41,.85); }
+  .lightbox-close{ top: 6px; right: 6px; }
+  .lightbox-counter{ bottom: -26px; }
+}
+
 .meta{
   display:flex; align-items:center; justify-content: space-between;
   font-size: 11.5px;
@@ -282,6 +485,124 @@ nav a:hover{ color: var(--accent-mint); }
   border-top: 1px dashed var(--line);
   padding-top: 12px;
 }
+
+/* ---------- ações de edição/exclusão, só pra quem publicou o post ---------- */
+.post-actions{
+  display:flex; gap: 6px;
+  margin-top: -4px;
+}
+.post-action-btn{
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, transform .15s ease;
+}
+.post-action-btn:hover{ transform: translateY(-1px); }
+.post-action-btn.edit:hover{ border-color: var(--accent-mustard); color: var(--accent-mustard); }
+.post-action-btn.delete:hover{ border-color: var(--accent-pink); color: var(--accent-pink); }
+
+/* ---------- modal (usado pra editar posts) ---------- */
+.modal{
+  position: fixed; inset:0;
+  background: rgba(10,9,11,.72);
+  display:flex; align-items:center; justify-content:center;
+  z-index: 200;
+  padding: 20px;
+}
+.modal.hidden{ display:none; }
+.modal-box{
+  position: relative;
+  width: 100%; max-width: 440px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 28px 26px 22px;
+}
+.modal-tape{
+  position:absolute; top:-10px; left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 70px; height:20px;
+  background: linear-gradient(180deg, #d8cfae, #c9bd91);
+  opacity: .85;
+  box-shadow: 0 2px 4px rgba(0,0,0,.35);
+}
+.modal-box h3{
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 24px;
+  letter-spacing: .5px;
+  margin-bottom: 18px;
+}
+.modal-box form{ display:grid; gap: 18px; }
+.modal-box label{
+  font-size: 11px; color: var(--text-dim);
+  letter-spacing:1px; text-transform: uppercase;
+  display:block; margin-bottom: 7px;
+}
+.modal-box input,
+.modal-box textarea,
+.modal-box select{
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--line);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  padding: 8px 2px 10px;
+  border-radius: 0;
+  transition: border-color .15s ease;
+}
+.modal-box textarea{ resize: vertical; min-height: 84px; }
+.modal-box input:focus,
+.modal-box textarea:focus,
+.modal-box select:focus{
+  outline: none;
+  border-bottom: 1px solid var(--accent-mustard);
+}
+.modal-box select{ border-bottom: 1px dashed var(--line); cursor: pointer; }
+.modal-box select option{ background: var(--bg-soft); }
+
+.modal-actions{ display:flex; gap: 14px; align-items:center; margin-top: 4px; }
+
+.clip-btn-primary{
+  background: var(--accent-mustard);
+  color: #1a1512;
+  border: 2px solid #1a1512;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 11px 20px;
+  border-radius: 2px;
+  cursor: pointer;
+  transform: rotate(-1deg);
+  transition: transform .15s ease, background .15s ease;
+}
+.clip-btn-primary:hover{ transform: rotate(0deg) translateY(-2px); background: var(--accent-mint); }
+
+.clip-btn-ghost{
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  letter-spacing: .3px;
+  text-decoration: underline dashed;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  padding: 6px 4px;
+  transition: color .15s ease;
+}
+.clip-btn-ghost:hover{ color: var(--accent-orange); }
+
+#edit-form-status{ font-size: 12px; color: var(--text-dim); }
 .author{ display:flex; align-items:center; gap:8px; }
 .avatar{
   width: 24px; height:24px; border-radius:50%;
@@ -374,6 +695,23 @@ nav a:hover{ color: var(--accent-mint); }
 #form-status{ font-size: 12px; color: var(--text-dim); }
 .denied-msg{ font-size: 12.5px; color: var(--accent-orange); margin-top: 12px; }
 
+/* ---------- barra de progresso do upload ---------- */
+.upload-progress{
+  display: none;
+  width: 100%;
+  height: 6px;
+  background: var(--bg-soft);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+.upload-progress-bar{
+  height: 100%;
+  width: 0%;
+  background: var(--accent-mint);
+  transition: width .15s ease;
+}
+
 footer{
   border-top: 1px solid var(--line);
   padding: 34px 28px;
@@ -457,12 +795,27 @@ footer .fine{ font-size: 11px; color: var(--text-dim); margin-top: 10px; }
 
   /* ---------- board / cards ---------- */
   .board{ padding: 48px 16px; }
+  .search-box{ font-size: 13px; padding: 11px 14px 11px 38px; }
+  .status-tabs{ width: 100%; overflow-x: auto; }
+  .status-tab{ font-size: 11.5px; padding: 8px 12px; }
+  .post-count{ width: 100%; margin-left: 0; text-align: right; }
   .grid{ gap: 18px; }
   .card{ padding: 16px; gap: 10px; }
   .card h3{ font-size: 21px; }
   .card p{ font-size: 13px; }
-  .card img.post-img{ height: 140px; }
+  .post-media{ height: 140px; }
   .tape{ width: 46px; height:16px; left: 18px; }
+  .post-actions{ flex-wrap: wrap; }
+  .load-more-btn{ width: 100%; padding: 13px 20px; }
+
+  /* ---------- modal de edição ---------- */
+  .modal{ padding: 14px; }
+  .modal-box{ padding: 22px 18px 18px; max-width: 100%; }
+  .modal-box h3{ font-size: 20px; margin-bottom: 14px; }
+  .modal-box form{ gap: 14px; }
+  .modal-actions{ flex-direction: column; align-items: stretch; gap: 10px; }
+  .clip-btn-primary{ width: 100%; text-align: center; }
+  .clip-btn-ghost{ text-align: center; }
 
   /* ---------- turma ---------- */
   .turma{ padding: 48px 16px 60px; }

@@ -221,6 +221,8 @@ document.addEventListener("click", (e) => {
 // ---------------------------------------------------------
 const clipGrid = document.getElementById("clip-grid");
 const clipEmpty = document.getElementById("clip-empty");
+const clipSearchInput = document.getElementById("clip-search");
+let clipSearchTerm = "";
 
 function renderCard(clip) {
   const card = document.createElement("div");
@@ -246,14 +248,36 @@ function renderClipadas() {
     filtered = filtered.filter((c) => c.year === currentYearFilter);
   }
 
+  if (clipSearchTerm) {
+    filtered = filtered.filter((c) => {
+      const haystack = `${c.text || ""} ${c.author || ""}`.toLowerCase();
+      return haystack.includes(clipSearchTerm);
+    });
+  }
+
   clipGrid.innerHTML = "";
   if (filtered.length === 0) {
+    clipEmpty.textContent = clipSearchTerm
+      ? "Nenhuma clipada bate com essa pesquisa."
+      : "Nenhuma clipada aqui ainda. Bora consertar isso 👇";
     clipEmpty.style.display = "block";
     return;
   }
   clipEmpty.style.display = "none";
   filtered.forEach((clip) => clipGrid.appendChild(renderCard(clip)));
 }
+
+// ---------------------------------------------------------
+// PESQUISA — filtra por frase ou autor
+// ---------------------------------------------------------
+let clipSearchDebounce = null;
+clipSearchInput?.addEventListener("input", () => {
+  clearTimeout(clipSearchDebounce);
+  clipSearchDebounce = setTimeout(() => {
+    clipSearchTerm = clipSearchInput.value.trim().toLowerCase();
+    renderClipadas();
+  }, 200);
+});
 
 async function loadClipadas() {
   try {
@@ -403,4 +427,159 @@ randomAgainBtn.addEventListener("click", showRandomClip);
 randomModalClose.addEventListener("click", closeRandomModal);
 randomModal.addEventListener("click", (e) => {
   if (e.target === randomModal) closeRandomModal();
+});
+
+// ---------------------------------------------------------
+// MINIGAME — "quem disse isso?"
+// mostra a frase + o ano, o usuário tenta acertar quem falou,
+// com contador de acertos e erros na sessão de jogo.
+// ---------------------------------------------------------
+const gameBtn = document.getElementById("game-btn");
+const gameModal = document.getElementById("game-modal");
+const gameCloseBtn = document.getElementById("game-close-btn");
+const gameNextBtn = document.getElementById("game-next-btn");
+const gameQuoteWrap = document.getElementById("game-quote-wrap");
+const gameOptionsEl = document.getElementById("game-options");
+const gameFeedbackEl = document.getElementById("game-feedback");
+const gameHitsEl = document.getElementById("game-hits");
+const gameMissesEl = document.getElementById("game-misses");
+
+let gameHits = 0;
+let gameMisses = 0;
+let gameCurrentClip = null;
+let gameAnswered = false;
+let gameQueue = []; // fila embaralhada, garante que nenhuma clipada se repete até o fim de um ciclo
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Autores únicos presentes nas clipadas já carregadas (não a lista fixa
+// AUTHORS inteira), assim as opções erradas fazem sentido pro que existe.
+function getUniqueClipAuthors() {
+  const map = new Map();
+  allClips.forEach((c) => {
+    if (c.authorKey && !map.has(c.authorKey)) map.set(c.authorKey, c.author);
+  });
+  return [...map.entries()].map(([key, label]) => ({ key, label }));
+}
+
+// Monta (ou remonta) a fila embaralhada com todas as clipadas atuais.
+// Chamada no início do jogo e sempre que a fila esvazia — assim toda
+// clipada aparece exatamente uma vez antes de qualquer uma repetir.
+function buildGameQueue() {
+  gameQueue = shuffleArray(allClips);
+}
+
+function pickGameClip() {
+  if (allClips.length === 0) return null;
+  if (gameQueue.length === 0) buildGameQueue();
+  return gameQueue.shift();
+}
+
+function startNewQuestion() {
+  const uniqueAuthors = getUniqueClipAuthors();
+
+  if (uniqueAuthors.length < 2) {
+    gameQuoteWrap.innerHTML = `<p style="color:var(--text-dim); font-size:13.5px;">Precisa de clipadas de pelo menos 2 pessoas diferentes pra jogar.</p>`;
+    gameOptionsEl.innerHTML = "";
+    gameFeedbackEl.textContent = "";
+    gameFeedbackEl.className = "game-feedback";
+    gameNextBtn.classList.add("hidden");
+    return;
+  }
+
+  gameCurrentClip = pickGameClip();
+  gameAnswered = false;
+  gameFeedbackEl.textContent = "";
+  gameFeedbackEl.className = "game-feedback";
+  gameNextBtn.classList.add("hidden");
+
+  gameQuoteWrap.innerHTML = `
+    <div class="game-quote">
+      <p class="game-quote-text">${gameCurrentClip.text || ""}</p>
+      <span class="game-quote-year">registrado em ${gameCurrentClip.year || "?"}</span>
+    </div>
+  `;
+
+  // opções: o autor certo + até 4 errados, sorteados entre quem mais tem clipada
+  const correctKey = gameCurrentClip.authorKey;
+  const wrongPool = uniqueAuthors.filter((a) => a.key !== correctKey);
+  const wrongOptions = shuffleArray(wrongPool).slice(0, 4);
+  const correctOption = { key: correctKey, label: gameCurrentClip.author };
+  const options = shuffleArray([correctOption, ...wrongOptions]);
+
+  gameOptionsEl.innerHTML = "";
+  options.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "game-option-btn";
+    btn.textContent = opt.label;
+    btn.dataset.key = opt.key;
+    btn.addEventListener("click", () => answerQuestion(opt.key, correctKey, btn));
+    gameOptionsEl.appendChild(btn);
+  });
+}
+
+function answerQuestion(chosenKey, correctKey, btnEl) {
+  if (gameAnswered) return;
+  gameAnswered = true;
+
+  const isCorrect = chosenKey === correctKey;
+  if (isCorrect) {
+    gameHits++;
+    btnEl.classList.add("correct");
+    gameFeedbackEl.textContent = "Acertou! 🎯";
+    gameFeedbackEl.className = "game-feedback hit";
+  } else {
+    gameMisses++;
+    btnEl.classList.add("wrong");
+    gameFeedbackEl.textContent = `Errou! Era ${gameCurrentClip.author}.`;
+    gameFeedbackEl.className = "game-feedback miss";
+  }
+
+  gameHitsEl.textContent = `✓ ${gameHits}`;
+  gameMissesEl.textContent = `✗ ${gameMisses}`;
+
+  [...gameOptionsEl.children].forEach((btn) => {
+    btn.disabled = true;
+    if (btn.dataset.key === correctKey) btn.classList.add("correct");
+  });
+
+  gameNextBtn.classList.remove("hidden");
+}
+
+function openGameModal() {
+  gameHits = 0;
+  gameMisses = 0;
+  gameCurrentClip = null;
+  gameHitsEl.textContent = "✓ 0";
+  gameMissesEl.textContent = "✗ 0";
+  buildGameQueue();
+  gameModal.classList.remove("hidden");
+  startNewQuestion();
+}
+
+function closeGameModal() {
+  gameModal.classList.add("hidden");
+}
+
+gameBtn.addEventListener("click", openGameModal);
+gameNextBtn.addEventListener("click", startNewQuestion);
+gameCloseBtn.addEventListener("click", closeGameModal);
+gameModal.addEventListener("click", (e) => {
+  if (e.target === gameModal) closeGameModal();
+});
+
+// Esc fecha o modal (jogo, sorteio ou criação) que estiver aberto no momento
+document.addEventListener("keydown", (e) => {
+  if (e.key !== "Escape") return;
+  if (!gameModal.classList.contains("hidden")) closeGameModal();
+  else if (!randomModal.classList.contains("hidden")) closeRandomModal();
+  else if (!clipModal.classList.contains("hidden")) closeModal();
 });

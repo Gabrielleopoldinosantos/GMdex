@@ -60,6 +60,13 @@
 
   <section class="board" id="clipadas">
 
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="search" id="clip-search" class="search-box" placeholder="Pesquisar clipadas por frase ou autor...">
+    </div>
+
     <div class="filter-row">
       <div class="filter-wrap">
         <button id="filter-btn" class="filter-btn" aria-haspopup="listbox" aria-expanded="false">
@@ -81,6 +88,10 @@
 
       <button id="random-clip-btn" class="random-btn" title="Clipada aleatória" aria-label="Sortear clipada aleatória">
         <span class="dice">🎲</span> Clipada random
+      </button>
+
+      <button id="game-btn" class="game-btn" title="Jogo: quem disse isso?" aria-label="Jogar quem disse isso">
+        <span class="game-icon">🎯</span> Quem disse isso?
       </button>
 
       <button id="add-clip-btn" class="add-clip-btn hidden" title="Adicionar clipada" aria-label="Adicionar clipada">+</button>
@@ -131,6 +142,27 @@
     <div class="modal-actions">
       <button type="button" id="random-again-btn" class="clip-btn-primary">Sortear outra</button>
       <button type="button" id="random-modal-close" class="clip-btn-ghost">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal do minigame "quem disse isso?" -->
+<div id="game-modal" class="modal hidden">
+  <div class="modal-box game-modal-box">
+    <div class="modal-tape"></div>
+    <div class="game-header">
+      <div class="game-label">🎯 quem disse isso?</div>
+      <div class="game-score">
+        <span class="score-hit" id="game-hits">✓ 0</span>
+        <span class="score-miss" id="game-misses">✗ 0</span>
+      </div>
+    </div>
+    <div class="game-quote-wrap" id="game-quote-wrap"></div>
+    <div class="game-options" id="game-options"></div>
+    <p class="game-feedback" id="game-feedback"></p>
+    <div class="modal-actions game-modal-actions">
+      <button type="button" id="game-next-btn" class="clip-btn-primary hidden">Próxima →</button>
+      <button type="button" id="game-close-btn" class="clip-btn-ghost">Encerrar jogo</button>
     </div>
   </div>
 </div>

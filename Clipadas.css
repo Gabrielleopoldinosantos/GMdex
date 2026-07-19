@@ -5,6 +5,34 @@
 
 .clip-hero{ padding-bottom: 50px; }
 
+/* ---------- barra de pesquisa ---------- */
+.search-wrap{
+  position: relative;
+  margin-bottom: 22px;
+}
+.search-icon{
+  position: absolute;
+  left: 16px; top: 50%;
+  transform: translateY(-50%);
+  width: 16px; height:16px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.search-box{
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13.5px;
+  padding: 12px 16px 12px 42px;
+  border-radius: 30px;
+  transition: border-color .2s ease;
+}
+.search-box::placeholder{ color: var(--text-dim); }
+.search-box:focus{ outline: none; border-color: var(--accent-mint); }
+.search-box::-webkit-search-cancel-button{ filter: invert(1) opacity(.5); cursor: pointer; }
+
 /* ---------- linha do filtro ---------- */
 .filter-row{
   display:flex;
@@ -117,7 +145,7 @@
   border-radius: 50%;
   border: 1px dashed var(--line);
   background: transparent;
-  color: var(--text-dim);
+  color: var(--text);
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
@@ -131,6 +159,30 @@
 /* quando o botão de sortear já empurrou tudo pra direita com margin-left:auto,
    o "+" fica colado nele — só um respiro visual */
 .random-btn + .add-clip-btn{ margin-left: 4px; }
+.random-btn + .game-btn{ margin-left: 4px; }
+.game-btn + .add-clip-btn{ margin-left: 4px; }
+
+/* ---------- botão "minigame: quem disse isso?" ---------- */
+.game-btn{
+  display:flex; align-items:center; gap:8px;
+  background: transparent;
+  border: 1px dashed var(--accent-pink);
+  color: var(--accent-pink);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 12.5px;
+  letter-spacing: .3px;
+  padding: 11px 16px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: border-color .2s ease, transform .15s ease, background .15s ease;
+}
+.game-btn .game-icon{ display:inline-block; font-size: 14px; }
+.game-btn:hover{
+  background: #e8628c14;
+  border-style: solid;
+  transform: translateY(-1px);
+}
 
 /* ---------- cards de citação — moldura de "ficha" ---------- */
 .clip-card{
@@ -336,6 +388,87 @@
 }
 .random-modal-box .modal-actions{ justify-content: center; }
 
+/* ---------- modal do minigame "quem disse isso?" ---------- */
+.game-modal-box{ max-width: 480px; }
+.game-header{
+  display:flex; align-items:center; justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.game-label{
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent-pink);
+}
+.game-score{
+  display:flex; gap: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.score-hit{ color: var(--accent-mint); }
+.score-miss{ color: var(--accent-pink); }
+
+.game-quote-wrap{ margin-bottom: 20px; min-height: 92px; }
+.game-quote{
+  background: var(--bg-soft);
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  padding: 18px 18px 14px;
+}
+.game-quote-text{
+  font-family: 'Indie Flower', cursive;
+  font-size: 20px;
+  line-height: 1.35;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.game-quote-text::before{ content:"“"; color: var(--accent-orange); }
+.game-quote-text::after{ content:"”"; color: var(--accent-orange); }
+.game-quote-year{
+  font-size: 11.5px;
+  color: var(--text-dim);
+  letter-spacing: .3px;
+}
+
+.game-options{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.game-option-btn{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s ease, transform .15s ease, background .15s ease;
+}
+.game-option-btn:hover:not(:disabled){ border-color: var(--accent-orange); transform: translateY(-1px); }
+.game-option-btn:disabled{ cursor: default; }
+.game-option-btn.correct{ background: #7fd1ae22; border-color: var(--accent-mint); color: var(--accent-mint); }
+.game-option-btn.wrong{ background: #e8628c22; border-color: var(--accent-pink); color: var(--accent-pink); }
+
+.game-feedback{
+  min-height: 18px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.game-feedback.hit{ color: var(--accent-mint); }
+.game-feedback.miss{ color: var(--accent-pink); }
+
+.game-modal-actions{ justify-content: space-between; }
+
 /* =============================================================
    MOBILE — otimizado pra faixa do Samsung Galaxy A51/A71
    ============================================================= */
@@ -343,12 +476,15 @@
 
   .clip-hero{ padding-bottom: 30px; }
 
+  .search-box{ font-size: 12.5px; padding: 11px 14px 11px 38px; }
+
   .filter-row{ gap: 12px; margin-bottom: 26px; }
   .filter-btn{ font-size: 12.5px; padding: 10px 14px; }
   .filter-list{ min-width: 180px; }
   .filter-list li{ padding: 10px 14px; font-size: 12.5px; }
   .add-clip-btn{ width: 34px; height: 34px; font-size: 16px; }
   .random-btn{ font-size: 11.5px; padding: 9px 13px; margin-left: 0; }
+  .game-btn{ font-size: 11.5px; padding: 9px 13px; }
 
   .clip-grid{ gap: 18px; }
   .clip-card{ padding: 26px 16px 16px; }
@@ -363,4 +499,8 @@
   .modal-actions{ flex-direction: column; align-items: stretch; gap: 10px; }
   .clip-btn-primary{ width: 100%; text-align: center; }
   .clip-btn-ghost{ text-align: center; }
+
+  .game-header{ gap: 6px; }
+  .game-options{ grid-template-columns: 1fr; }
+  .game-modal-actions{ flex-direction: column-reverse; align-items: stretch; }
 }
