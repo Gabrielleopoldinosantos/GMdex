@@ -36,6 +36,21 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 // ---------------------------------------------------------
+// SEGURANÇA — nunca confiar em texto vindo do Firestore ao montar HTML,
+// senão uma clipada com <img onerror="..."> rodaria script no navegador
+// de quem visitar a página (XSS armazenado).
+// ---------------------------------------------------------
+function escapeHTML(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// ---------------------------------------------------------
 // LISTA DE AUTORES — chave interna + nome exibido
 // (ordem alfabética, "Recentes" é tratado à parte e vem primeiro)
 // ---------------------------------------------------------
@@ -230,10 +245,10 @@ function renderCard(clip) {
   card.dataset.index = String(clip.number).padStart(3, "0");
   card.innerHTML = `
     <div class="tape"></div>
-    <p class="clip-text">${clip.text || ""}</p>
+    <p class="clip-text">${escapeHTML(clip.text || "")}</p>
     <div class="clip-meta">
-      <span class="clip-author">${clip.author || "?"}</span>
-      <span class="clip-year">${clip.year || ""}</span>
+      <span class="clip-author">${escapeHTML(clip.author || "?")}</span>
+      <span class="clip-year">${escapeHTML(clip.year || "")}</span>
     </div>
   `;
   return card;
@@ -360,6 +375,10 @@ clipForm.addEventListener("submit", async (e) => {
 
   if (!authorMeta || !text || !year) {
     clipFormStatus.textContent = "Preenche todos os campos.";
+    return;
+  }
+  if (text.length > 500) {
+    clipFormStatus.textContent = "Texto muito longo (máximo 500 caracteres).";
     return;
   }
 
@@ -502,8 +521,8 @@ function startNewQuestion() {
 
   gameQuoteWrap.innerHTML = `
     <div class="game-quote">
-      <p class="game-quote-text">${gameCurrentClip.text || ""}</p>
-      <span class="game-quote-year">registrado em ${gameCurrentClip.year || "?"}</span>
+      <p class="game-quote-text">${escapeHTML(gameCurrentClip.text || "")}</p>
+      <span class="game-quote-year">registrado em ${escapeHTML(gameCurrentClip.year || "?")}</span>
     </div>
   `;
 

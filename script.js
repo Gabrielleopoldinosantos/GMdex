@@ -38,6 +38,35 @@ const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 // ---------------------------------------------------------
+// SEGURANÇA — nunca confiar em texto vindo do Firestore ao montar HTML.
+// Qualquer campo de texto (title, text, author, tag...) passa por aqui
+// antes de entrar num template de innerHTML, senão alguém poderia
+// publicar um "post" com <img onerror="..."> e rodar script no navegador
+// de quem visitar a página (XSS armazenado).
+// ---------------------------------------------------------
+function escapeHTML(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Só aceita URLs https vindas da Cloudinary — impede que uma URL maliciosa
+// (ex: `" onerror="alert(1)`) quebre o atributo src e injete HTML/JS.
+function isSafeMediaUrl(url) {
+  if (typeof url !== "string") return false;
+  try {
+    const u = new URL(url);
+    return u.protocol === "https:" && u.hostname === "res.cloudinary.com";
+  } catch {
+    return false;
+  }
+}
+
+// ---------------------------------------------------------
 // CLOUDINARY — upload de imagem/vídeo (grátis, sem servidor)
 // ---------------------------------------------------------
 const CLOUDINARY_CLOUD_NAME = "h7alwq39";
@@ -209,17 +238,34 @@ function renderCard(post) {
   const card = document.createElement("div");
   card.className = "card";
 
-  const items = getMediaItems(post).slice(0, 4);
+  // filtra qualquer mídia com URL que não seja realmente da Cloudinary
+  const items = getMediaItems(post).filter((item) => isSafeMediaUrl(item.url)).slice(0, 4);
+
+  const safeTitle = escapeHTML(post.title || "(sem título)");
+  const safeText = escapeHTML(post.text || "");
+  const safeAuthor = escapeHTML(post.author || "anônimo");
+  const safeInitial = escapeHTML((post.authorInitial || "?").slice(0, 2));
+  // "tag" também precisa ser validada: alguém podendo escrever direto no
+  // Firestore poderia mandar qualquer string aqui, não só as do <select>.
+  const allowedTags = ["jogos", "receita", "filme", "role", "memes", "musica", "arte", "outros"];
+  const safeTag = allowedTags.includes(post.tag) ? post.tag : "outros";
 
   let mediaHtml = "";
   if (items.length) {
     const cells = items.map((item, idx) =>
       item.type === "video"
-        ? `<video src="${item.url}" data-media-idx="${idx}" playsinline muted></video>`
-        : `<img src="${item.url}" data-media-idx="${idx}" alt="${post.title || ""}">`
+        ? `<video src="${escapeHTML(item.url)}" data-media-idx="${idx}" playsinline muted></video>`
+        : `<img src="${escapeHTML(item.url)}" data-media-idx="${idx}" alt="${safeTitle}">`
     ).join("");
     mediaHtml = `<div class="post-media count-${items.length}">${cells}</div>`;
   }
+
+  // avatarColor também vem do Firestore e vai dentro de um atributo style —
+  // só aceita as cores que a própria UI oferece, ignora qualquer outra coisa.
+  const allowedAvatarColors = [
+    "var(--accent-mint)", "var(--accent-orange)", "var(--accent-mustard)", "var(--accent-pink)"
+  ];
+  const safeAvatarColor = allowedAvatarColors.includes(post.avatarColor) ? post.avatarColor : "var(--accent-mint)";
 
   const isOwner = auth.currentUser && post.authorUid === auth.currentUser.uid;
   const ownerActionsHtml = isOwner ? `
@@ -230,15 +276,15 @@ function renderCard(post) {
 
   card.innerHTML = `
     <div class="tape"></div>
-    <span class="tag ${post.tag || "role"}">${post.tag || "geral"}</span>
+    <span class="tag ${safeTag}">${safeTag}</span>
     ${mediaHtml}
-    <h3>${post.title || "(sem título)"}</h3>
-    <p>${post.text || ""}</p>
+    <h3>${safeTitle}</h3>
+    <p>${safeText}</p>
     ${ownerActionsHtml}
     <div class="meta">
       <div class="author">
-        <div class="avatar" style="background:${post.avatarColor || "var(--accent-mint)"}">${post.authorInitial || "?"}</div>
-        ${post.author || "anônimo"}
+        <div class="avatar" style="background:${safeAvatarColor}">${safeInitial}</div>
+        ${safeAuthor}
       </div>
       <span>${formatDate(post.createdAt)}</span>
     </div>
@@ -278,10 +324,10 @@ let lightboxIndex = 0;
 
 function renderLightboxMedia() {
   const item = lightboxItems[lightboxIndex];
-  if (!item) return;
+  if (!item || !isSafeMediaUrl(item.url)) return;
   lightboxMedia.innerHTML = item.type === "video"
-    ? `<video src="${item.url}" controls playsinline autoplay></video>`
-    : `<img src="${item.url}" alt="">`;
+    ? `<video src="${escapeHTML(item.url)}" controls playsinline autoplay></video>`
+    : `<img src="${escapeHTML(item.url)}" alt="">`;
 
   const multiple = lightboxItems.length > 1;
   lightboxPrev.style.display = multiple ? "" : "none";
@@ -458,6 +504,14 @@ editForm.addEventListener("submit", async (e) => {
     editFormStatus.textContent = "Preenche pelo menos título e texto.";
     return;
   }
+  if (title.length > 120) {
+    editFormStatus.textContent = "Título muito longo (máximo 120 caracteres).";
+    return;
+  }
+  if (text.length > 5000) {
+    editFormStatus.textContent = "Texto muito longo (máximo 5000 caracteres).";
+    return;
+  }
 
   editFormStatus.textContent = "Salvando...";
 
@@ -517,6 +571,14 @@ if (newPostForm) {
 
     if (!title || !text) {
       statusEl.textContent = "Preenche pelo menos título e texto.";
+      return;
+    }
+    if (title.length > 120) {
+      statusEl.textContent = "Título muito longo (máximo 120 caracteres).";
+      return;
+    }
+    if (text.length > 5000) {
+      statusEl.textContent = "Texto muito longo (máximo 5000 caracteres).";
       return;
     }
 

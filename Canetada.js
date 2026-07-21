@@ -36,6 +36,22 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+// ---------------------------------------------------------
+// SEGURANÇA — como esta página aceita ideias de QUALQUER pessoa, sem
+// exigir login, o cuidado com o texto que entra em innerHTML é ainda
+// mais importante aqui do que no resto do site. Nunca confiar em nada
+// vindo do Firestore sem escapar primeiro.
+// ---------------------------------------------------------
+function escapeHTML(str) {
+  if (str === null || str === undefined) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 // Esta página é ABERTA: qualquer um vê a lista e sugere ideia, sem login.
 // O login aqui só serve pra liberar os botões de mover status
 // (finalizar / recusar / reabrir), restritos a quem está em "authorized_posters".
@@ -132,12 +148,12 @@ function renderRow(idea) {
     <button class="status-dot ${canModerate ? "can-moderate" : ""}" aria-label="mudar status"></button>
     <div class="task-main">
       <div class="task-top">
-        <h4 class="task-title">${idea.title || "(sem título)"}</h4>
+        <h4 class="task-title">${escapeHTML(idea.title || "(sem título)")}</h4>
         ${badge}
       </div>
-      <p class="task-text">${idea.text || ""}</p>
+      <p class="task-text">${escapeHTML(idea.text || "")}</p>
       <div class="task-meta">
-        <span class="task-author">${idea.author || "anônimo"}</span>
+        <span class="task-author">${escapeHTML(idea.author || "anônimo")}</span>
         <span>${formatDate(idea.createdAt)}</span>
       </div>
     </div>
@@ -241,6 +257,18 @@ ideaForm.addEventListener("submit", async (e) => {
 
   if (!title || !text) {
     ideaFormStatus.textContent = "Preenche pelo menos título e ideia.";
+    return;
+  }
+  if (title.length > 80) {
+    ideaFormStatus.textContent = "Título muito longo (máximo 80 caracteres).";
+    return;
+  }
+  if (text.length > 600) {
+    ideaFormStatus.textContent = "Texto muito longo (máximo 600 caracteres).";
+    return;
+  }
+  if (author.length > 30) {
+    ideaFormStatus.textContent = "Nome muito longo (máximo 30 caracteres).";
     return;
   }
 
